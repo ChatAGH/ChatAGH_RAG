@@ -1,4 +1,4 @@
-from src.agents.orchestration_agent import OrchestrationAgent
+from src.agents.supervisor_agent import SupervisorAgent
 
 
-__all__ = ["OrchestrationAgent"]
+__all__ = ["SupervisorAgent"]

@@ -1,10 +1,10 @@
-from src.state import ChatState
-from src.agents import OrchestrationAgent
+from src.states import ChatState
+from src.agents import SupervisorAgent
 
 
-class OrchestrationNode:
+class SupervisorNode:
     def __init__(self):
-        self.agent = OrchestrationAgent()
+        self.agent = SupervisorAgent()
 
     def __call__(self, state: ChatState) -> dict:
         agent_response = self.agent.invoke(

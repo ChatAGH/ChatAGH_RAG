@@ -1,0 +1,4 @@
+
+
+class SummaryGeneration:
+    pass

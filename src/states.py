@@ -10,3 +10,8 @@ class ChatState(TypedDict):
     retrieval_decision: bool
     agents_queries: dict
     response: str
+
+
+class RetrievalState(TypedDict):
+    query: str
+    retrieved_chunks: dict

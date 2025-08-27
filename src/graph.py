@@ -1,17 +1,17 @@
 from langchain_core.messages import BaseMessage, HumanMessage
 from langgraph.graph.state import StateGraph, END, START
 
-from src.state import ChatState
-from src.nodes import RetrievalNode, OrchestrationNode
+from src.states import ChatState
+from src.nodes import RetrievalNode, SupervisorNode
 from src.utils.agents_info import AgentsInfo, AgentDetails
 from src.utils.chat_history import ChatHistory
 
 
 class ChatGraph:
     def __init__(self):
-        self.builder = (
+        self.graph = (
             StateGraph(ChatState)
-            .add_node("orchestration_node", OrchestrationNode())
+            .add_node("orchestration_node", SupervisorNode())
             .add_node("retrieval_node", RetrievalNode())
             .add_edge(START, "orchestration_node")
             .add_conditional_edges(
@@ -29,7 +29,7 @@ class ChatGraph:
             chat_history=chat_history,
             agents_info=agents_info,
         )
-        return self.builder.invoke(state)["response"]
+        return self.graph.invoke(state)["response"]
 
     def invoke(self, chat_history: list[BaseMessage]):
         pass

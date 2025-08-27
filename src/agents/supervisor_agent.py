@@ -13,7 +13,7 @@ from src.utils.agents_info import AgentDetails, AgentsInfo
 AGENTS_NAMES = ["recrutation_agent", "dormitories_agent"]
 
 
-class OrchestrationOutput(BaseModel):
+class SupervisorOutput(BaseModel):
     retrieval_decision: bool
     message: Optional[str] = None
     queries: Optional[dict[str, str]] = None
@@ -43,10 +43,10 @@ class OrchestrationOutput(BaseModel):
         return values
 
 
-class OrchestrationAgent(BaseAgent):
+class SupervisorAgent(BaseAgent):
     def __init__(self):
         super().__init__()
-        self.output_parser = PydanticOutputParser(pydantic_object=OrchestrationOutput)
+        self.output_parser = PydanticOutputParser(pydantic_object=SupervisorOutput)
         self.prompt = PromptTemplate(
             input_variables=["agents_info", "chat_history", "latest_user_message"],
             template=ORCHESTRATION_AGENT_PROMPT_TEMPLATE
@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
     from src.utils.chat_history import ChatHistory
 
-    agent = OrchestrationAgent()
+    agent = SupervisorAgent()
     res = agent.invoke(
         agents_info=AgentsInfo([
             AgentDetails(
