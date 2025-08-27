@@ -18,7 +18,7 @@ from src.agents.retrieval.utils import aggregate_by_url
 
 
 class ContextRetrieval:
-    def __init__(self, num_chunks: int = 5):
+    def __init__(self, num_chunks: int = 2):
         self.num_chunks = num_chunks
         self.graph_edges_collection = mongo_client[MONGO_DATABASE_NAME]["edges"]
         self.chunks_collection = mongo_client[MONGO_DATABASE_NAME]["chunks"]
@@ -53,8 +53,11 @@ class ContextRetrieval:
         logger.info("Found {} related URLs for {}".format(len(related_urls), url))
 
         chunks = []
-        for url in related_urls:
-            chunks.extend([c for c in self._get_chunks_for_url(url) if c not in retrieved_chunks])
+        with ThreadPoolExecutor() as executor:
+            futures = {executor.submit(self._get_chunks_for_url, url): url for url in related_urls}
+            for future in as_completed(futures):
+                new_chunks = future.result()
+                chunks.extend([c for c in new_chunks if c not in retrieved_chunks])
 
         if chunks:
             context_embedding = embedding_model.encode([retrieved_context]).tolist()

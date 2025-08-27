@@ -72,7 +72,7 @@ without hallucinating or introducing unsupported claims.
 
 ### Rules:
 1. **Relevance Spectrum**:
-   - Include not only direct answers to the query but also any background, context, relevant information from the chunks.
+   - Include informations which are relevant or might be helpful for answering user's query.
 
 2. **Faithfulness**:
    - Use only information present in the chunks.
@@ -88,7 +88,7 @@ without hallucinating or introducing unsupported claims.
 
 5. **Output Format**:
    Answer:
-   [Provide the synthesized summary here]
+   [Provide the summary here]
 
    Sources:
    - <url_1>: [brief description of what this source contributed]
