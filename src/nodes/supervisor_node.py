@@ -23,5 +23,4 @@ class SupervisorNode:
         return {
             "retrieval_decision": agent_response.retrieval_decision,
             "agents_queries": agent_response.queries,
-            "response": agent_response.message,
         }

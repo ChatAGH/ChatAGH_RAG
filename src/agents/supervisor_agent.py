@@ -24,17 +24,12 @@ class SupervisorOutput(BaseModel):
     @model_validator(mode="before")
     def check_fields_based_on_decision(cls, values):
         decision = values.get('retrieval_decision')
-        message = values.get('message')
         queries = values.get('queries')
 
         if decision:
             if not queries:
                 raise ValueError("When retrieval_decision is True, 'queries' must be provided")
-            if message is not None:
-                raise ValueError("'message' should not be provided when retrieval_decision is True")
         else:
-            if not message:
-                raise ValueError("When retrieval_decision is False, 'message' must be provided")
             if queries is not None:
                 raise ValueError("'queries' should not be provided when retrieval_decision is False")
 
