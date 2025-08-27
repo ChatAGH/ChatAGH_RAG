@@ -1,12 +1,14 @@
+from langchain_core.messages import BaseMessage, HumanMessage
 from langgraph.graph.state import StateGraph, END, START
 
 from src.state import ChatState
 from src.nodes import RetrievalNode, OrchestrationNode
+from src.utils import ChatHistory, AgentsInfo, AgentDetails
 
 
 class ChatGraph:
     def __init__(self):
-        self.workflow = (
+        self.builder = (
             StateGraph(ChatState)
             .add_node("orchestration_node", OrchestrationNode())
             .add_node("retrieval_node", RetrievalNode())
@@ -19,11 +21,33 @@ class ChatGraph:
             .compile()
         )
 
-    def query(self, question: str) -> str:
+    def query(self, question: str, **kwargs) -> str:
+        chat_history = ChatHistory(messages=[HumanMessage(question)])
+        agents_info = kwargs["agents_info"]
+        state = ChatState(
+            chat_history=chat_history,
+            agents_info=agents_info,
+        )
+        return self.builder.invoke(state)["response"]
+
+    def invoke(self, chat_history: list[BaseMessage]):
         pass
 
-    def invoke(self, chat_history: list):
+    def stream(self, chat_history: list[BaseMessage]):
         pass
 
-    def stream(self, chat_history: list):
-        pass
+
+if __name__ == "__main__":
+    from dotenv import load_dotenv
+    load_dotenv("/Users/wnowogorski/PycharmProjects/ChatAGH_RAG/.env")
+
+    chat_graph = ChatGraph()
+    print(chat_graph.query(
+        "Jak zostać studentem AGH?", agents_info=[
+            AgentDetails(
+                name="recrutation_agent",
+                description="Agent retrieving informations about rectutation",
+                cached_history=None
+            )
+        ]
+    ))

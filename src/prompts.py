@@ -50,14 +50,13 @@ Instructions:
    - Include URLs to sources if they contain information relevant to the user’s query.
    - Your output should contain mentioned json only, no other text outside of json structure, Do NOT include any Markdown, backticks, ```json tags, or other formatting.
 
-Agents information:
+AGENTS INFORMATION:
 {agents_info}
 
-Chat history:
+CHAT HISTORY:
 {chat_history}
 
-User’s latest message:
-{latest_user_message}
+HUMAN LATEST MESSAGE: {latest_user_message}
 
 Your Response:
 """

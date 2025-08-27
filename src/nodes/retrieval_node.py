@@ -1,4 +1,5 @@
 
 
 class RetrievalNode:
-    pass
+    def __call__(self):
+        pass

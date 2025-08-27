@@ -6,8 +6,9 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import Runnable
 from langchain.schema import BaseMessage
 
-from base_agent import BaseAgent
+from src.agents.base_agent import BaseAgent
 from src.prompts import ORCHESTRATION_AGENT_PROMPT_TEMPLATE
+from src.utils import AgentDetails, AgentsInfo
 
 AGENTS_NAMES = ["recrutation_agent", "dormitories_agent"]
 
@@ -70,18 +71,21 @@ if __name__ == "__main__":
 
     agent = OrchestrationAgent()
     res = agent.invoke(
-        agents_info="""
-            AGENT_NAME: recrutation_agent
-            DESCRIPTION: Agent which retrieves informations about recrutation.
-            HISTORY: Query: Ile kosztuja studja stacjonarne na AGH? Answer: Są darmowe.
-            
-            AGENT NAME: dormitories_agent
-            DESCRIPTION: Agent which retrieves informations about accomodation at university.
-            History: Query: Ile jest akademików? Answer: 1300
-        """,
+        agents_info=AgentsInfo([
+            AgentDetails(
+                name="recrutation_agent",
+                description="Agent retrieving informations about recrutation",
+                cached_history={
+                    "query": "Jak zostać studentem AGH?",
+                    "response": "Musisz przejsc proces rekrutacji"
+                }
+            )
+        ]),
         chat_history=ChatHistory(
             messages=[
-                HumanMessage("Ile jest akademików?")
+                HumanMessage("Hej"),
+                AIMessage("Cześć!, Jak mogę ci pomóc?"),
+                HumanMessage("Jak dostać się na AGH?")
             ]
         ),
     )
