@@ -63,4 +63,9 @@ Your Response:
 
 
 SUMMARY_GENERATION_PROMPT_TEMPLATE = """
+Context: {context}
+
+Query: {query}
+
+Answer:
 """

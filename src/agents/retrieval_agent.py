@@ -20,6 +20,7 @@ class RetrievalAgent:
             .add_node("summary_generation", SummaryGeneration())
             .add_edge("similarity_search", "context_retrieval")
             .add_edge("context_retrieval", "summary_generation")
+            .set_entry_point("similarity_search")
             .compile()
         )
 

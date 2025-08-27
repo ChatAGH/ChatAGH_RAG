@@ -26,7 +26,7 @@ class SummaryGeneration:
             api_key=random.choice(self.api_keys[0])
         )
         self.prompt = PromptTemplate(
-            input_variables=["context"],
+            input_variables=["context", "query"],
             template=SUMMARY_GENERATION_PROMPT_TEMPLATE
         )
         self.output_parser = PydanticOutputParser(pydantic_object=SummaryGenerationOutput)
@@ -42,5 +42,5 @@ class SummaryGeneration:
                 f"### Related context: {retrieved_context.related_chunks}\n"
             )
 
-        summary = self.chain.invoke({"context"})
+        summary = self.chain.invoke({"context": context, "query": state["query"]})
         return {"summary": summary}

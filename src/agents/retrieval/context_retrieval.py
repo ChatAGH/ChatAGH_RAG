@@ -1,4 +1,5 @@
 from numpy import array
+from langchain_core.documents import Document
 from sklearn.metrics.pairwise import cosine_similarity
 from src.vector_store.utils import bm25_similarity
 
@@ -47,7 +48,7 @@ class ContextRetrieval:
                 bm25_weight=0,
                 top_n=self.num_chunks,
             )
-            return aggregate_by_url(related_chunks)
+            return aggregate_by_url([c["chunk"] for c in related_chunks])
         else:
             return {}
 
@@ -73,13 +74,16 @@ class ContextRetrieval:
 
     def _get_chunks_for_url(self, url: str):
         """Returns all chunks for a given url."""
-        return list(self.chunks_collection.find({"metadata.url": url}))
+        chunks = list(self.chunks_collection.find({"metadata.url": url}))
+        return [
+            Document(page_content=d["text"], metadata=d["metadata"] | {"embedding": d["embedding"]}) for d in chunks
+        ]
 
     def _combined_similarity(
         self,
         retrieved_context: str,
         retrieved_context_embedding: list[float],
-        chunks: list[dict],
+        chunks: list[Document],
         bm25_similarity_func,
         bm25_weight: float = 0.5,
         top_n: int = 5
@@ -99,13 +103,13 @@ class ContextRetrieval:
             List of top_n chunks with their combined similarity score.
         """
         summary_embedding = array(retrieved_context_embedding).reshape(1, -1)
-        chunk_embeddings = array([chunk["embedding"] for chunk in chunks])
+        chunk_embeddings = array([chunk.metadata["embedding"] for chunk in chunks])
 
         embedding_similarities = cosine_similarity(summary_embedding, chunk_embeddings)[0]
 
         combined_scores = []
         for idx, chunk in enumerate(chunks):
-            bm25_score = bm25_similarity_func(retrieved_context, chunk["text"])
+            bm25_score = bm25_similarity_func(retrieved_context, chunk.page_content)
             embedding_score = embedding_similarities[idx]
             combined_score = bm25_weight * bm25_score + (1 - bm25_weight) * embedding_score
             combined_scores.append((idx, combined_score))
@@ -116,7 +120,7 @@ class ContextRetrieval:
             {
                 "chunk": chunks[i],
                 "combined_score": score,
-                "bm25_score": bm25_similarity_func(retrieved_context, chunks[i]["text"]),
+                "bm25_score": bm25_similarity_func(retrieved_context, chunks[i].page_content),
                 "embedding_score": embedding_similarities[i],
             }
             for i, score in top_indices

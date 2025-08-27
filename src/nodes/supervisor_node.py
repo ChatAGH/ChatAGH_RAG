@@ -1,5 +1,6 @@
 from src.states import ChatState
 from src.agents import SupervisorAgent
+from src.utils.utils import logger
 
 
 class SupervisorNode:

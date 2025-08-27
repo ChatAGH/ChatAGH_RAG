@@ -3,9 +3,13 @@ import os
 import time
 import logging
 import functools
+from dotenv import load_dotenv
 
 from pymongo import MongoClient
 from sentence_transformers import SentenceTransformer
+
+
+load_dotenv("/Users/wnowogorski/PycharmProjects/ChatAGH_RAG/.env")
 
 logger = logging.getLogger("chat_graph_logger")
 logger.setLevel(logging.INFO)
@@ -25,7 +29,7 @@ def log_execution_time(func):
 mongo_client = MongoClient(os.environ.get("MONGODB_URI"), tlsAllowInvalidCertificates=True)
 MONGO_DATABASE_NAME = "chat_agh"
 
-embedding_model = SentenceTransformer("intfloat/multilingual-e5-large", device="cuda")
+embedding_model = SentenceTransformer("intfloat/multilingual-e5-large")
 
 @dataclass
 class RetrievedContext:

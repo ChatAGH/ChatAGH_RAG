@@ -1,3 +1,5 @@
+from langchain_core.documents import Document
+
 from src.states import RetrievalState
 from src.vector_store.mongodb import MongoDBVectorStore
 from src.utils.utils import logger, log_execution_time, mongo_client, MONGO_DATABASE_NAME
@@ -48,7 +50,8 @@ class SimilaritySearch:
                     seen.add(key)
                     unique_docs.append(d)
 
-            retrieved_docs[url] = sorted(unique_docs, key=lambda d: d["metadata"]["sequence_number"])
+            unique_docs = [Document(page_content=d["text"], metadata=d["metadata"]) for d in unique_docs]
+            retrieved_docs[url] = sorted(unique_docs, key=lambda d: d.metadata["sequence_number"])
 
         return retrieved_docs
 
