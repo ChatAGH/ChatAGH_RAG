@@ -27,3 +27,20 @@ class AgentsInfo:
                 text += f"  Cached Conversation: {cached_history_text}"
 
         return text
+
+
+@dataclass
+class RetrievalAgentInfo:
+    name: str
+    vector_store_index_name: str
+    description: str
+
+
+RETRIEVAL_AGENTS = [
+    RetrievalAgentInfo(
+        name="recrutation_agent",
+        vector_store_index_name="chunks",
+        description="Agent retrieving information about recrutation on AGH University"
+    )
+]
+

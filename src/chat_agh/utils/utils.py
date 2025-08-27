@@ -10,7 +10,6 @@ from sentence_transformers import SentenceTransformer
 
 
 load_dotenv("/Users/wnowogorski/PycharmProjects/ChatAGH_RAG/.env")
-
 logger = logging.getLogger("chat_graph_logger")
 logger.setLevel(logging.INFO)
 if not logger.handlers:

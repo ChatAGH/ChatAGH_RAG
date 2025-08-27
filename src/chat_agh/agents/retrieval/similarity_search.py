@@ -2,10 +2,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from langchain_core.documents import Document
 
-from src.states import RetrievalState
-from src.vector_store.mongodb import MongoDBVectorStore
-from src.utils.utils import logger, log_execution_time, mongo_client, MONGO_DATABASE_NAME
-from src.agents.retrieval.utils import aggregate_by_url
+from src.chat_agh.states import RetrievalState
+from src.chat_agh.vector_store.mongodb import MongoDBVectorStore
+from src.chat_agh.utils.utils import logger, log_execution_time, mongo_client, MONGO_DATABASE_NAME
+from src.chat_agh.agents.retrieval.utils import aggregate_by_url
 
 
 class SimilaritySearch:

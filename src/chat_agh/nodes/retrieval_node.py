@@ -1,25 +1,9 @@
-from dataclasses import dataclass
-
-from src.utils.utils import logger, log_execution_time
-from src.agents.retrieval_agent import RetrievalAgent
-from src.states import ChatState
-from src.utils.agents_info import AgentsInfo, AgentDetails
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-
-@dataclass
-class RetrievalAgentInfo:
-    name: str
-    vector_store_index_name: str
-    description: str
-
-RETRIEVAL_AGENTS = [
-    RetrievalAgentInfo(
-        name="recrutation_agent",
-        vector_store_index_name="chunks",
-        description="Agent retrieving information about recrutation on AGH University"
-    )
-]
+from src.chat_agh.utils.utils import logger, log_execution_time
+from src.chat_agh.agents.retrieval_agent import RetrievalAgent
+from src.chat_agh.states import ChatState
+from src.chat_agh.utils.agents_info import AgentsInfo, AgentDetails, RETRIEVAL_AGENTS
 
 
 class RetrievalNode:

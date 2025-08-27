@@ -1,9 +1,9 @@
 from typing import List
 
 from langchain_core.documents import Document
-from pymongo import MongoClient, TEXT
+from pymongo import TEXT
 
-from src.utils.utils import (
+from src.chat_agh.utils.utils import (
     log_execution_time,
     embedding_model,
     mongo_client,

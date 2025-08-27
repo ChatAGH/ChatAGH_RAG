@@ -5,7 +5,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import Runnable
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-from src.prompts import GENERATION_PROMPT_TEMPLATE
+from src.chat_agh.prompts import GENERATION_PROMPT_TEMPLATE
 
 DEFAULT_GENERATION_MODEL = "gemini-2.5-flash"
 

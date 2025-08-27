@@ -8,13 +8,12 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import Runnable
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-from src.prompts import SUPERVISOR_AGENT_PROMPT_TEMPLATE
-from src.utils.agents_info import AgentDetails, AgentsInfo
-from src.utils.chat_history import ChatHistory
+from src.chat_agh.prompts import SUPERVISOR_AGENT_PROMPT_TEMPLATE
+from src.chat_agh.utils.agents_info import AgentDetails, AgentsInfo, RETRIEVAL_AGENTS
+from src.chat_agh.utils.chat_history import ChatHistory
 
-AGENTS_NAMES = ["recrutation_agent", "dormitories_agent"]
+
 DEFAULT_SUPERVISOR_MODEL = "gemini-2.5-flash"
-
 
 class SupervisorOutput(BaseModel):
     retrieval_decision: bool
@@ -33,9 +32,10 @@ class SupervisorOutput(BaseModel):
             if queries is not None:
                 raise ValueError("'queries' should not be provided when retrieval_decision is False")
 
+        agents_names = [agent.name for agent in RETRIEVAL_AGENTS]
         if queries:
             for agent in queries.keys():
-                if agent not in AGENTS_NAMES:
+                if agent not in agents_names:
                     raise ValueError(f"Agent '{agent}' is not defined")
 
         return values
@@ -64,11 +64,11 @@ class SupervisorAgent:
 
 if __name__ == "__main__":
     from dotenv import load_dotenv
-    load_dotenv("/Users/wnowogorski/PycharmProjects/ChatAGH_RAG/.env")
+    load_dotenv("/.env")
 
     from langchain.schema import HumanMessage, AIMessage
 
-    from src.utils.chat_history import ChatHistory
+    from src.chat_agh.utils.chat_history import ChatHistory
 
     agent = SupervisorAgent()
     res = agent.invoke(
