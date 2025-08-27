@@ -1,1 +1,1 @@
-# ChatAGH_RAG
+# chat_agh_core
