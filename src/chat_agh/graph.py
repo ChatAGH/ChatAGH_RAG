@@ -1,10 +1,10 @@
 from langchain_core.messages import HumanMessage
 from langgraph.graph.state import StateGraph, END, START
 
-from src.chat_agh.states import ChatState
-from src.chat_agh.nodes import RetrievalNode, SupervisorNode, GenerationNode
-from src.chat_agh.utils.agents_info import AgentsInfo, AgentDetails, RETRIEVAL_AGENTS
-from src.chat_agh.utils.chat_history import ChatHistory
+from chat_agh.states import ChatState
+from chat_agh.nodes import RetrievalNode, SupervisorNode, GenerationNode
+from chat_agh.utils.agents_info import AgentsInfo, AgentDetails, RETRIEVAL_AGENTS
+from chat_agh.utils.chat_history import ChatHistory
 
 
 class ChatGraph:

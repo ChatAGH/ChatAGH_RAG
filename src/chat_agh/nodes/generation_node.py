@@ -1,8 +1,8 @@
 from langgraph.config import get_stream_writer
 
-from src.chat_agh.states import ChatState
-from src.chat_agh.agents import GenerationAgent
-from src.chat_agh.utils.utils import log_execution_time, retry_on_exception
+from chat_agh.states import ChatState
+from chat_agh.agents import GenerationAgent
+from chat_agh.utils.utils import log_execution_time, retry_on_exception
 
 
 class GenerationNode:

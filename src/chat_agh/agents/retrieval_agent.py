@@ -1,7 +1,7 @@
 from langgraph.graph.state import StateGraph
 
-from src.chat_agh.states import RetrievalState
-from src.chat_agh.agents.retrieval import (
+from chat_agh.states import RetrievalState
+from chat_agh.agents.retrieval import (
     SimilaritySearch,
     ContextRetrieval,
     SummaryGeneration

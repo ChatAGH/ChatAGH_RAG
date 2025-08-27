@@ -1,9 +1,9 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from src.chat_agh.utils.utils import logger, log_execution_time
-from src.chat_agh.agents.retrieval_agent import RetrievalAgent
-from src.chat_agh.states import ChatState
-from src.chat_agh.utils.agents_info import AgentsInfo, AgentDetails, RETRIEVAL_AGENTS
+from chat_agh.utils.utils import logger, log_execution_time
+from chat_agh.agents.retrieval_agent import RetrievalAgent
+from chat_agh.states import ChatState
+from chat_agh.utils.agents_info import AgentsInfo, AgentDetails, RETRIEVAL_AGENTS
 
 
 class RetrievalNode:

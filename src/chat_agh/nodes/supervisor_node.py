@@ -1,6 +1,6 @@
-from src.chat_agh.states import ChatState
-from src.chat_agh.agents import SupervisorAgent
-from src.chat_agh.utils.utils import logger, log_execution_time, retry_on_exception
+from chat_agh.states import ChatState
+from chat_agh.agents import SupervisorAgent
+from chat_agh.utils.utils import logger, log_execution_time, retry_on_exception
 
 
 class SupervisorNode:

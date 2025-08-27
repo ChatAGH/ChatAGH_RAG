@@ -4,9 +4,9 @@ from numpy import array
 from langchain_core.documents import Document
 from sklearn.metrics.pairwise import cosine_similarity
 
-from src.chat_agh.vector_store.utils import bm25_similarity
-from src.chat_agh.states import RetrievalState
-from src.chat_agh.utils.utils import (
+from chat_agh.vector_store.utils import bm25_similarity
+from chat_agh.states import RetrievalState
+from chat_agh.utils.utils import (
     mongo_client,
     MONGO_DATABASE_NAME,
     embedding_model,
@@ -14,7 +14,7 @@ from src.chat_agh.utils.utils import (
     RetrievedContext,
     log_execution_time
 )
-from src.chat_agh.agents.retrieval.utils import aggregate_by_url
+from chat_agh.agents.retrieval.utils import aggregate_by_url
 
 
 class ContextRetrieval:

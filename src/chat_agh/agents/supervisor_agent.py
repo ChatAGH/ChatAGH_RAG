@@ -8,9 +8,9 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import Runnable
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-from src.chat_agh.prompts import SUPERVISOR_AGENT_PROMPT_TEMPLATE
-from src.chat_agh.utils.agents_info import AgentDetails, AgentsInfo, RETRIEVAL_AGENTS
-from src.chat_agh.utils.chat_history import ChatHistory
+from chat_agh.prompts import SUPERVISOR_AGENT_PROMPT_TEMPLATE
+from chat_agh.utils.agents_info import AgentDetails, AgentsInfo, RETRIEVAL_AGENTS
+from chat_agh.utils.chat_history import ChatHistory
 
 
 DEFAULT_SUPERVISOR_MODEL = "gemini-2.5-flash"

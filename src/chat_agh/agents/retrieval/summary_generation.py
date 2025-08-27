@@ -6,9 +6,9 @@ from langchain_core.runnables import Runnable
 from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-from src.chat_agh.utils.utils import retry_on_exception, log_execution_time
-from src.chat_agh.prompts import SUMMARY_GENERATION_PROMPT_TEMPLATE
-from src.chat_agh.states import RetrievalState
+from chat_agh.utils.utils import retry_on_exception, log_execution_time
+from chat_agh.prompts import SUMMARY_GENERATION_PROMPT_TEMPLATE
+from chat_agh.states import RetrievalState
 
 DEFAULT_SUMMARY_GENERATION_MODEL = "gemini-2.5-flash"
 
