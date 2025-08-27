@@ -3,7 +3,8 @@ from langgraph.graph.state import StateGraph, END, START
 
 from src.state import ChatState
 from src.nodes import RetrievalNode, OrchestrationNode
-from src.utils import ChatHistory, AgentsInfo, AgentDetails
+from src.utils.agents_info import AgentsInfo, AgentDetails
+from src.utils.chat_history import ChatHistory
 
 
 class ChatGraph:

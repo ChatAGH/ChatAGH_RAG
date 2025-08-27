@@ -1,6 +1,7 @@
 from typing import TypedDict
 
-from src.utils import ChatHistory, AgentsInfo
+from src.utils.agents_info import AgentsInfo
+from src.utils.chat_history import ChatHistory
 
 
 class ChatState(TypedDict):

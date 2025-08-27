@@ -8,7 +8,7 @@ from langchain.schema import BaseMessage
 
 from src.agents.base_agent import BaseAgent
 from src.prompts import ORCHESTRATION_AGENT_PROMPT_TEMPLATE
-from src.utils import AgentDetails, AgentsInfo
+from src.utils.agents_info import AgentDetails, AgentsInfo
 
 AGENTS_NAMES = ["recrutation_agent", "dormitories_agent"]
 
@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     from langchain.schema import HumanMessage, AIMessage
 
-    from src.utils import ChatHistory
+    from src.utils.chat_history import ChatHistory
 
     agent = OrchestrationAgent()
     res = agent.invoke(
