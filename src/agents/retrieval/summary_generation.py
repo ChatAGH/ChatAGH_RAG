@@ -2,20 +2,15 @@ import os
 import json
 import random
 
-from pydantic import BaseModel
 from langchain_core.runnables import Runnable
 from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.output_parsers import PydanticOutputParser
 
+from src.utils.utils import retry_on_exception, log_execution_time
 from src.prompts import SUMMARY_GENERATION_PROMPT_TEMPLATE
 from src.states import RetrievalState
 
 DEFAULT_SUMMARY_GENERATION_MODEL = "gemini-2.5-flash"
-
-
-class SummaryGenerationOutput(BaseModel):
-    summary: str
 
 
 class SummaryGeneration:
@@ -23,15 +18,16 @@ class SummaryGeneration:
         self.api_keys = json.loads(os.getenv("GEMINI_API_KEYS", "[]"))
         self.llm = ChatGoogleGenerativeAI(
             model=model_name,
-            api_key=random.choice(self.api_keys[0])
+            api_key=random.choice(self.api_keys)
         )
         self.prompt = PromptTemplate(
             input_variables=["context", "query"],
             template=SUMMARY_GENERATION_PROMPT_TEMPLATE
         )
-        self.output_parser = PydanticOutputParser(pydantic_object=SummaryGenerationOutput)
-        self.chain: Runnable = self.prompt | self.llm | self.output_parser
+        self.chain: Runnable = self.prompt | self.llm
 
+    @log_execution_time
+    @retry_on_exception(attempts=3, delay=1, backoff=3)
     def __call__(self, state: RetrievalState):
         context = ""
         for retrieved_context in state["retrieved_context"]:

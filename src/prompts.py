@@ -63,9 +63,43 @@ Your Response:
 
 
 SUMMARY_GENERATION_PROMPT_TEMPLATE = """
-Context: {context}
+You are a research assistant specialized in evidence-grounded information extraction and synthesis.
 
-Query: {query}
+Your task is to analyze a user query and a collection of retrieved text chunks. 
+Each chunk includes both text and a source URL. 
+You must extract and summarize **all information that is relevant or even loosely related to the query**, 
+without hallucinating or introducing unsupported claims.
 
-Answer:
+### Rules:
+1. **Relevance Spectrum**:
+   - Include not only direct answers to the query but also any background, context, relevant information from the chunks.
+
+2. **Faithfulness**:
+   - Use only information present in the chunks.
+   - Do not infer or invent new facts beyond what is stated.
+   - If the provided chunks contain no relevant information, state clearly: 
+     *“No relevant information was found in the retrieved documents.”*
+
+4. **Summary Style**:
+   - Present a clear, well-structured summary in full sentences.
+   - Organize content logically (group similar points together).
+   - Avoid repetition, but keep coverage comprehensive.
+   - Write in neutral, factual, and professional tone.
+
+5. **Output Format**:
+   Answer:
+   [Provide the synthesized summary here]
+
+   Sources:
+   - <url_1>: [brief description of what this source contributed]
+   - <url_2>: [brief description of what this source contributed]
+   - ...
+
+Context:
+{context}
+
+User's query:
+{query}
+
+Your answer:
 """

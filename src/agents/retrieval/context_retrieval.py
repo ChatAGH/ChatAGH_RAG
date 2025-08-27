@@ -1,10 +1,19 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 from numpy import array
 from langchain_core.documents import Document
 from sklearn.metrics.pairwise import cosine_similarity
-from src.vector_store.utils import bm25_similarity
 
+from src.vector_store.utils import bm25_similarity
 from src.states import RetrievalState
-from src.utils.utils import mongo_client, MONGO_DATABASE_NAME, embedding_model, logger, RetrievedContext
+from src.utils.utils import (
+    mongo_client,
+    MONGO_DATABASE_NAME,
+    embedding_model,
+    logger,
+    RetrievedContext,
+    log_execution_time
+)
 from src.agents.retrieval.utils import aggregate_by_url
 
 
@@ -14,17 +23,26 @@ class ContextRetrieval:
         self.graph_edges_collection = mongo_client[MONGO_DATABASE_NAME]["edges"]
         self.chunks_collection = mongo_client[MONGO_DATABASE_NAME]["chunks"]
 
+    @log_execution_time
     def __call__(self, state: RetrievalState):
         retrieved_chunks = state["retrieved_chunks"]
         contexts = []
-        for url, retrieved_chunks in retrieved_chunks.items():
-            related_chunks = self.process_single_url(url, retrieved_chunks)
-            context = RetrievedContext(
+
+        def process(url, chunks):
+            related_chunks = self.process_single_url(url, chunks)
+            return RetrievedContext(
                 source_url=url,
-                chunks=retrieved_chunks,
+                chunks=chunks,
                 related_chunks=related_chunks,
             )
-            contexts.append(context)
+
+        with ThreadPoolExecutor() as executor:
+            futures = [
+                executor.submit(process, url, chunks)
+                for url, chunks in retrieved_chunks.items()
+            ]
+            for future in as_completed(futures):
+                contexts.append(future.result())
 
         return {"retrieved_context": contexts}
 

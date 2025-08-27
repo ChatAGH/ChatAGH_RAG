@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 
-from src.agents import retrieval_agent
+from src.utils.utils import logger, log_execution_time
 from src.agents.retrieval_agent import RetrievalAgent
 from src.states import ChatState
 from src.utils.agents_info import AgentsInfo, AgentDetails
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 @dataclass
@@ -31,24 +32,32 @@ class RetrievalNode:
             ) for agent_info in RETRIEVAL_AGENTS
         ]
 
+    @log_execution_time
     def __call__(self, state: ChatState) -> dict:
         queries = state["agents_queries"]
-
         responses = []
-        for agent_name, query in queries.items():
-            for agent in self.retrieval_agents:
-                if agent.name == agent_name:
-                    agent_response = agent.query(query)
-                    responses.append(
-                        AgentDetails(
-                            name=agent.name,
-                            description=agent.description,
-                            cached_history={
-                                "query": query,
-                                "response": agent_response,
-                            }
-                        )
-                    )
+
+        def query_agent(agent, query):
+            logger.info(f"Querying agent: {agent.name}. Query: {query}")
+            agent_response = agent.query(query)
+            logger.info(f"Agent response: {agent_response}")
+            return AgentDetails(
+                name=agent.name,
+                description=agent.description,
+                cached_history={
+                    "query": query,
+                    "response": agent_response,
+                }
+            )
+
+        futures = []
+        with ThreadPoolExecutor() as executor:
+            for agent_name, query in queries.items():
+                for agent in self.retrieval_agents:
+                    if agent.name == agent_name:
+                        futures.append(executor.submit(query_agent, agent, query))
+
+            for future in as_completed(futures):
+                responses.append(future.result())
 
         return {"agents_info": AgentsInfo(agents_details=responses)}
-

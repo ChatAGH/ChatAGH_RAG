@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 from langchain_core.documents import Document
 
 from src.states import RetrievalState
@@ -13,6 +15,7 @@ class SimilaritySearch:
         self.vector_store = MongoDBVectorStore(index_name)
         self.chunks_collection = mongo_client[MONGO_DATABASE_NAME]["chunks"]
 
+    @log_execution_time
     def __call__(self, state: RetrievalState):
         retrieved_chunks = self.vector_store.search(state["query"], k=self.num_retrieved_chunks)
         aggregated_docs = aggregate_by_url(retrieved_chunks)
@@ -24,12 +27,11 @@ class SimilaritySearch:
 
         return {"retrieved_chunks": chunks_windows}
 
-    @log_execution_time
     def get_chunks_windows(self, urls):
         """Returns chunks for specific sequence_numbers per URL (batched and deduplicated)."""
         retrieved_docs = {}
 
-        for url, docs in urls.items():
+        def process_url(url, docs):
             seq_numbers = set()
             for doc in docs:
                 seq = doc.metadata["sequence_number"]
@@ -50,8 +52,20 @@ class SimilaritySearch:
                     seen.add(key)
                     unique_docs.append(d)
 
-            unique_docs = [Document(page_content=d["text"], metadata=d["metadata"]) for d in unique_docs]
-            retrieved_docs[url] = sorted(unique_docs, key=lambda d: d.metadata["sequence_number"])
+            unique_docs = [
+                Document(page_content=d["text"], metadata=d["metadata"])
+                for d in unique_docs
+            ]
+            return url, sorted(unique_docs, key=lambda d: d.metadata["sequence_number"])
+
+        with ThreadPoolExecutor() as executor:
+            futures = [
+                executor.submit(process_url, url, docs)
+                for url, docs in urls.items()
+            ]
+            for future in as_completed(futures):
+                url, docs = future.result()
+                retrieved_docs[url] = docs
 
         return retrieved_docs
 
