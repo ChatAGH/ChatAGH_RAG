@@ -1,16 +1,19 @@
+import os
+import json
 from typing import Optional
 
 from pydantic import BaseModel, model_validator
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import Runnable
-from langchain.schema import BaseMessage
+from langchain_google_genai import ChatGoogleGenerativeAI
 
-from src.agents.base_agent import BaseAgent
-from src.prompts import ORCHESTRATION_AGENT_PROMPT_TEMPLATE
+from src.prompts import SUPERVISOR_AGENT_PROMPT_TEMPLATE
 from src.utils.agents_info import AgentDetails, AgentsInfo
+from src.utils.chat_history import ChatHistory
 
 AGENTS_NAMES = ["recrutation_agent", "dormitories_agent"]
+DEFAULT_SUPERVISOR_MODEL = "gemini-2.5-flash"
 
 
 class SupervisorOutput(BaseModel):
@@ -43,17 +46,20 @@ class SupervisorOutput(BaseModel):
         return values
 
 
-class SupervisorAgent(BaseAgent):
+class SupervisorAgent:
     def __init__(self):
         super().__init__()
+        self.api_keys = json.loads(os.getenv("GEMINI_API_KEYS", "[]"))
+        self.llm = ChatGoogleGenerativeAI(model=DEFAULT_SUPERVISOR_MODEL, api_key=self.api_keys[0])
+
         self.output_parser = PydanticOutputParser(pydantic_object=SupervisorOutput)
         self.prompt = PromptTemplate(
             input_variables=["agents_info", "chat_history", "latest_user_message"],
-            template=ORCHESTRATION_AGENT_PROMPT_TEMPLATE
+            template=SUPERVISOR_AGENT_PROMPT_TEMPLATE
         )
         self.chain: Runnable = self.prompt | self.llm | self.output_parser
 
-    def _inference(self, agents_info, chat_history: list[BaseMessage]):
+    def invoke(self, agents_info: AgentsInfo, chat_history: ChatHistory):
         return self.chain.invoke({
             "agents_info": agents_info,
             "chat_history": chat_history[:-1],

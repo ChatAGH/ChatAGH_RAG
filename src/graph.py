@@ -6,6 +6,10 @@ from src.nodes import RetrievalNode, SupervisorNode
 from src.utils.agents_info import AgentsInfo, AgentDetails
 from src.utils.chat_history import ChatHistory
 
+RETRIEVAL_AGENTS = [
+
+]
+
 
 class ChatGraph:
     def __init__(self):

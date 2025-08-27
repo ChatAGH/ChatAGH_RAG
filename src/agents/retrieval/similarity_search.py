@@ -1,6 +1,7 @@
 from src.states import RetrievalState
 from src.vector_store.mongodb import MongoDBVectorStore
 from src.utils.utils import logger, log_execution_time, mongo_client, MONGO_DATABASE_NAME
+from src.agents.retrieval.utils import aggregate_by_url
 
 
 class SimilaritySearch:
@@ -12,7 +13,7 @@ class SimilaritySearch:
 
     def __call__(self, state: RetrievalState):
         retrieved_chunks = self.vector_store.search(state["query"], k=self.num_retrieved_chunks)
-        aggregated_docs = self.aggregate_by_url(retrieved_chunks)
+        aggregated_docs = aggregate_by_url(retrieved_chunks)
 
         logger.info(
             "Retrieved {} documents, source urls: {}".format(len(retrieved_chunks), aggregated_docs.keys())
@@ -20,17 +21,6 @@ class SimilaritySearch:
         chunks_windows = self.get_chunks_windows(aggregated_docs)
 
         return {"retrieved_chunks": chunks_windows}
-
-    @staticmethod
-    def aggregate_by_url(retrieved_chunks):
-        """Group retrieved chunks by source url's"""
-        urls = {}
-        for doc in retrieved_chunks:
-            if (url := doc.metadata["url"]) in urls:
-                urls[url].append(doc)
-            else:
-                urls[url] = [doc]
-        return urls
 
     @log_execution_time
     def get_chunks_windows(self, urls):

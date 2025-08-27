@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import os
 import time
 import logging
@@ -25,3 +26,21 @@ mongo_client = MongoClient(os.environ.get("MONGODB_URI"), tlsAllowInvalidCertifi
 MONGO_DATABASE_NAME = "chat_agh"
 
 embedding_model = SentenceTransformer("intfloat/multilingual-e5-large", device="cuda")
+
+@dataclass
+class RetrievedContext:
+    source_url: str
+    chunks: list
+    related_chunks: dict[str, list]
+
+    @property
+    def text(self):
+        chunks_text = "\n".join(self.chunks)
+        related_chunks_text = "\n".join(self.related_chunks)
+        text = (
+            f"Source URL: {self.source_url}\n"
+            f"Retrieved chunks: {chunks_text}\n"
+            f"Related context: {related_chunks_text}"
+        )
+        return text
+

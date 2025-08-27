@@ -1,4 +1,4 @@
-ORCHESTRATION_AGENT_PROMPT_TEMPLATE = """
+SUPERVISOR_AGENT_PROMPT_TEMPLATE = """
 You are an AI Assistant working at Akademia Górniczo-Hutnicza UST in Kraków.
 You are intelligent, confident, and helpful.
 Your primary goal is to chat with the user and provide accurate, reliable, and context-grounded answers.
@@ -59,4 +59,8 @@ CHAT HISTORY:
 HUMAN LATEST MESSAGE: {latest_user_message}
 
 Your Response:
+"""
+
+
+SUMMARY_GENERATION_PROMPT_TEMPLATE = """
 """

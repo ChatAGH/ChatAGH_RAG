@@ -15,3 +15,5 @@ class ChatState(TypedDict):
 class RetrievalState(TypedDict):
     query: str
     retrieved_chunks: dict
+    retrieved_context: dict
+    summary: str

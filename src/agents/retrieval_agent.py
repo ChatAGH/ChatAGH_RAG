@@ -8,10 +8,11 @@ from src.agents.retrieval import (
 )
 
 
-class BaseRetrievalAgent:
-    def __init__(self, agent_name: str, index_name: str):
+class RetrievalAgent:
+    def __init__(self, agent_name: str, index_name: str, description: str):
         self.name = agent_name
         self.index_name = index_name
+        self.description = description
         self.graph = (
             StateGraph(RetrievalState)
             .add_node("similarity_search", SimilaritySearch(index_name=self.index_name))
@@ -23,4 +24,5 @@ class BaseRetrievalAgent:
         )
 
     def query(self, query: str):
-        pass
+        initial_state = RetrievalState(query=query)
+        return self.graph.invoke(initial_state)["summary"]
