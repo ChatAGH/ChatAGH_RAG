@@ -4,11 +4,12 @@ from pydantic import BaseModel, model_validator
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import Runnable
+from langchain.schema import BaseMessage
 
 from base_agent import BaseAgent
 from src.prompts import ORCHESTRATION_AGENT_PROMPT_TEMPLATE
 
-AGENTS_NAMES = ["recrutation_agent"]
+AGENTS_NAMES = ["recrutation_agent", "dormitories_agent"]
 
 
 class OrchestrationOutput(BaseModel):
@@ -33,9 +34,10 @@ class OrchestrationOutput(BaseModel):
             if queries is not None:
                 raise ValueError("'queries' should not be provided when retrieval_decision is False")
 
-        for agent in queries.keys():
-            if agent not in AGENTS_NAMES:
-                raise ValueError(f"Agent '{agent}' is not defined")
+        if queries:
+            for agent in queries.keys():
+                if agent not in AGENTS_NAMES:
+                    raise ValueError(f"Agent '{agent}' is not defined")
 
         return values
 
@@ -50,17 +52,21 @@ class OrchestrationAgent(BaseAgent):
         )
         self.chain: Runnable = self.prompt | self.llm | self.output_parser
 
-    def _inference(self, agents_info, chat_history: list):
+    def _inference(self, agents_info, chat_history: list[BaseMessage]):
         return self.chain.invoke({
             "agents_info": agents_info,
             "chat_history": chat_history[:-1],
-            "latest_user_message": chat_history[-1]
+            "latest_user_message": chat_history[-1].content
         })
 
 
 if __name__ == "__main__":
     from dotenv import load_dotenv
-    load_dotenv("/Users/wnowogorski/PycharmProjects/ChatAGH_Core/.env")
+    load_dotenv("/Users/wnowogorski/PycharmProjects/ChatAGH_RAG/.env")
+
+    from langchain.schema import HumanMessage, AIMessage
+
+    from src.utils import ChatHistory
 
     agent = OrchestrationAgent()
     res = agent.invoke(
@@ -68,7 +74,15 @@ if __name__ == "__main__":
             AGENT_NAME: recrutation_agent
             DESCRIPTION: Agent which retrieves informations about recrutation.
             HISTORY: Query: Ile kosztuja studja stacjonarne na AGH? Answer: Są darmowe.
+            
+            AGENT NAME: dormitories_agent
+            DESCRIPTION: Agent which retrieves informations about accomodation at university.
+            History: Query: Ile jest akademików? Answer: 1300
         """,
-        chat_history=["Jak wyglada kalendarz rekrutacji?"],
+        chat_history=ChatHistory(
+            messages=[
+                HumanMessage("Ile jest akademików?")
+            ]
+        ),
     )
     print(res)
