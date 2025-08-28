@@ -13,7 +13,9 @@ class SupervisorNode:
         agent_response = self.agent.invoke(
             agents_info=state["agents_info"],
             chat_history=state["chat_history"],
+            context=state["context"]
         )
+
         logger.info(f"Retrieval decision: {agent_response.retrieval_decision}")
         if agent_response.retrieval_decision:
             logger.info(f"Queries: {agent_response.queries}")
@@ -23,4 +25,5 @@ class SupervisorNode:
         return {
             "retrieval_decision": agent_response.retrieval_decision,
             "agents_queries": agent_response.queries,
+            "response": agent_response.message,
         }

@@ -1,10 +1,13 @@
 from typing import TypedDict
 
+from langchain_core.documents import Document
+
 from chat_agh.utils.agents_info import AgentsInfo
 from chat_agh.utils.chat_history import ChatHistory
 
 
 class ChatState(TypedDict):
+    context: list[Document]
     chat_history: ChatHistory
     agents_info: AgentsInfo
     retrieval_decision: bool

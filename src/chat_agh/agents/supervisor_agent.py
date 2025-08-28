@@ -3,6 +3,7 @@ import json
 from typing import Optional
 
 from pydantic import BaseModel, model_validator
+from langchain_core.documents import Document
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import Runnable
@@ -24,11 +25,16 @@ class SupervisorOutput(BaseModel):
     def check_fields_based_on_decision(cls, values):
         decision = values.get('retrieval_decision')
         queries = values.get('queries')
+        message = values.get('message')
 
         if decision:
+            if message is not None:
+                raise ValueError("When retrieval_decision is True, 'message' must be None")
             if not queries:
                 raise ValueError("When retrieval_decision is True, 'queries' must be provided")
         else:
+            if not message:
+                raise ValueError("When retrieval_decision is False, 'message' must be provided")
             if queries is not None:
                 raise ValueError("'queries' should not be provided when retrieval_decision is False")
 
@@ -54,8 +60,9 @@ class SupervisorAgent:
         )
         self.chain: Runnable = self.prompt | self.llm | self.output_parser
 
-    def invoke(self, agents_info: AgentsInfo, chat_history: ChatHistory):
+    def invoke(self, agents_info: AgentsInfo, chat_history: ChatHistory, context: list[Document]):
         return self.chain.invoke({
+            "context": context,
             "agents_info": agents_info,
             "chat_history": chat_history[:-1],
             "latest_user_message": chat_history[-1].content

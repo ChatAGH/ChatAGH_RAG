@@ -2,7 +2,7 @@ from langchain_core.messages import HumanMessage
 from langgraph.graph.state import StateGraph, END, START
 
 from chat_agh.states import ChatState
-from chat_agh.nodes import RetrievalNode, SupervisorNode, GenerationNode
+from chat_agh.nodes import RetrievalNode, SupervisorNode, GenerationNode, InitialRetrievalNode
 from chat_agh.utils.agents_info import AgentsInfo, AgentDetails, RETRIEVAL_AGENTS
 from chat_agh.utils.chat_history import ChatHistory
 
@@ -11,13 +11,15 @@ class ChatGraph:
     def __init__(self):
         self.graph = (
             StateGraph(ChatState)
+            .add_node("initial_retrieval_node", InitialRetrievalNode(["chunks"]))
             .add_node("supervisor_node", SupervisorNode())
             .add_node("retrieval_node", RetrievalNode())
             .add_node("generation_node", GenerationNode())
-            .add_edge(START, "supervisor_node")
+            .add_edge(START, "initial_retrieval_node")
+            .add_edge("initial_retrieval_node", "supervisor_node")
             .add_conditional_edges(
                 "supervisor_node",
-                lambda state: "retrieval_node" if state["retrieval_decision"] else "generation_node"
+                lambda state: "retrieval_node" if state["retrieval_decision"] else END
             )
             .add_edge("retrieval_node", "generation_node")
             .add_edge("generation_node", END)
@@ -55,13 +57,14 @@ class ChatGraph:
         )
 
 if __name__ == "__main__":
+    from chat_agh.utils.utils import logger
     chat_graph = ChatGraph()
-    # print(chat_graph.query("Jak zostać studentem AGH?"))
 
     chat_history = ChatHistory(
         messages=[
-            HumanMessage("Jak dostać się na AGH?")
+            HumanMessage("Hej, ile godzin analizy na I semestrze informatyki i systemow inteligentnych?")
         ]
     )
+    logger.info("START")
     for c in chat_graph.stream(chat_history):
         print(c)
