@@ -18,23 +18,17 @@ DEFAULT_SUPERVISOR_MODEL = "gemini-2.5-flash"
 
 class SupervisorOutput(BaseModel):
     retrieval_decision: bool
-    message: Optional[str] = None
     queries: Optional[dict[str, str]] = None
 
     @model_validator(mode="before")
     def check_fields_based_on_decision(cls, values):
         decision = values.get('retrieval_decision')
         queries = values.get('queries')
-        message = values.get('message')
 
         if decision:
-            if message is not None:
-                raise ValueError("When retrieval_decision is True, 'message' must be None")
             if not queries:
                 raise ValueError("When retrieval_decision is True, 'queries' must be provided")
         else:
-            if not message:
-                raise ValueError("When retrieval_decision is False, 'message' must be provided")
             if queries is not None:
                 raise ValueError("'queries' should not be provided when retrieval_decision is False")
 

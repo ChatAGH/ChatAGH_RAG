@@ -19,11 +19,8 @@ class SupervisorNode:
         logger.info(f"Retrieval decision: {agent_response.retrieval_decision}")
         if agent_response.retrieval_decision:
             logger.info(f"Queries: {agent_response.queries}")
-        else:
-            logger.info(f"Response: {agent_response.message}")
 
         return {
             "retrieval_decision": agent_response.retrieval_decision,
             "agents_queries": agent_response.queries,
-            "response": agent_response.message,
         }

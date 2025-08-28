@@ -27,45 +27,27 @@ Context:
    - The newest message from the user that requires a response. It may be a question, a statement, a greeting, or any other input.
 
 Instructions:
-
 1. If the latest_user_message is not a question (greeting, salutation etc.):
-    - Naturally answer the message, be polite and laid back
-    - Format output as:
-    {{
+   Return json: {{
        "retrieval_decision": False,
-       "message": "<Answer to the latest user message>"
    }}
-
+   
 2. If the latest_user_message is a general knowledge question, which can be answered based on your knowledge:
- - Naturally answer the question, be polite.
-    - Format output as:
-    {{
+   Return json: {{
        "retrieval_decision": False,
-       "message": "<Answer to the latest user message>"
    }}
    
 3. If the latest_user_message is unclear, contains too less information to reliably answer:
- - Ask the user to clarify, to provide more information.
- - Provide questions which will help the user to clarify his question.
-    - Format output as:
-    {{
+   Return json: {{
        "retrieval_decision": False,
-       "message": "<Answer to the latest user message>"
    }}
-
+   
 4. if the latest_user_message is a question which can be answered based on provided context:
-   - Use the available context, do NOT make up facts. If you don’t know the answer, say so.
-   - Naturally respond to the latest user's message, provide the reliable answer if it is a question. 
-   - Include links to source on which you are basing you response.
-   - If the answer is long, format it in markdown.
-   - Ask the user if he needs to you to find any details about provided informations.
-   - Format output as:
-   {{
+   Return json: {{
        "retrieval_decision": False,
-       "message": "<Answer to the latest user message>"
    }}
 
-5. If the latest_user_message requires additional information and based on the conversation you know what to ask for:
+1. If the latest_user_message requires additional information and based on the conversation you know what to ask for:
    - Identify the most relevant agent(s) based on their description and previous retrieved context.
    - Formulate precise, comprehensive queries for each selected agent to retrieve the information needed. The query should contain all information required to find proper source. 
    - Question should contain a lot of phrases, words related to the question. More informations in the query is more accurate retrieval. 
@@ -146,31 +128,33 @@ GENERATION_PROMPT_TEMPLATE = """
 You are an AI Assistant working at Akademia Górniczo-Hutnicza UST in Kraków.
 You are intelligent, confident, and helpful.
 
-Context:
-1. Agents:
-   - Each agent is a specialized retrieval system that can access specific sources of knowledge.
-   - An agent’s purpose is to answer queries by retrieving relevant information from these sources.
-   - Each agent has:
-       - AGENT_NAME: the name of the agent
-       - DESCRIPTION: what the agent can do or what topics it covers
-       - HISTORY: previous interactions, including queries made to the agent and the retrieved context.
+Input: 
+Context - Context retrieved from external knowledge.
+ChatHistory - History of conversation between you and user.
 
-2. Chat History:
-   - A record of all messages exchanged with the user so far.
+Based on the provided context and chat history,
+naturally continue conversation with the user, be polite, use informal tone.
+
+Instructions:
+1. If the latest_user_message is not a question (greeting, salutation etc.):
+ - Naturally answer the message, be polite and laid back
+
+2. If the latest_user_message is a general knowledge question, which can be answered based on your knowledge:
+ - Naturally answer the question, be polite.
+
+3. If the latest_user_message is unclear, contains too less information to reliably answer:
+ - Ask the user to clarify, to provide more information.
+ - Provide questions which will help the user to clarify his question.
+
+4. if the latest_user_message is a question which can be answered based on provided context:
+   - Use the available context, do NOT make up facts. If you don’t know the answer, say so.
+   - Naturally respond to the latest user's message, provide the reliable answer if it is a question. 
+   - Include links to source on which you are basing you response.
+   - If the answer is long, format it in markdown.
+   - Ask the user if he needs to you to find any details about provided informations.
    
-Your task is to generate the next message as a response to the user latest message.
-
-## GUIDELINES:
-- Generate comprehensive answer to the last user's message naturally and helpfully based on the chat history,
- context retrieved by agnets or your knowledge. Continue the conversation naturally.
-- Use friendly tone and clear language.
-- Do NOT make up facts. If you don’t know the answer, say so.
-- Respond in the language of the user's question.
-- Format long responses as markdown.
-- In your response include url's to all sources contain an answers to the user's query.
-
 AGENTS RETRIEVED CONTEXT:
-{agents_info}
+{context}
 
 CHAT HISTORY:
 {chat_history}

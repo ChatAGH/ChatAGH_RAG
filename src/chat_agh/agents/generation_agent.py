@@ -22,9 +22,9 @@ class GenerationAgent:
         )
         self.chain: Runnable = self.prompt | self.llm
 
-    def stream(self, agents_info, chat_history):
+    def stream(self, chat_history, context):
         start_state = {
-            "agents_info": agents_info,
+            "context": context,
             "chat_history": chat_history
         }
         for chunk in self.chain.stream(start_state):

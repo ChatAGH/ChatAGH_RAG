@@ -13,8 +13,14 @@ class GenerationNode:
     @log_execution_time
     def __call__(self, state: ChatState) -> dict:
         writer = get_stream_writer()
+
+        if any(agent.cached_history for agent in state["agents_info"].agents_details):
+            context = state["agents_info"]
+        else:
+            context = state["context"]
+
         args ={
-            "agents_info": state["agents_info"],
+            "context": context,
             "chat_history": state["chat_history"]
         }
         response = ""

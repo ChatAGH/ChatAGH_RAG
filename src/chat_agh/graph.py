@@ -19,7 +19,7 @@ class ChatGraph:
             .add_edge("initial_retrieval_node", "supervisor_node")
             .add_conditional_edges(
                 "supervisor_node",
-                lambda state: "retrieval_node" if state["retrieval_decision"] else END
+                lambda state: "retrieval_node" if state["retrieval_decision"] else "generation_node"
             )
             .add_edge("retrieval_node", "generation_node")
             .add_edge("generation_node", END)
@@ -62,7 +62,7 @@ if __name__ == "__main__":
 
     chat_history = ChatHistory(
         messages=[
-            HumanMessage("Hej, ile godzin analizy na I semestrze informatyki i systemow inteligentnych?")
+            HumanMessage("Jak zostać studentem AGH?")
         ]
     )
     logger.info("START")
