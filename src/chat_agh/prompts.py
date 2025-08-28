@@ -1,3 +1,7 @@
+from datetime import date, datetime
+
+TODAY_STR = date.today().isoformat()
+
 SUPERVISOR_AGENT_PROMPT_TEMPLATE = """
 You are a supervisor agent in RAG system.
 Your primary goal is to chat with the user and provide accurate, reliable, and context-grounded answers.
@@ -62,6 +66,7 @@ Instructions:
    }}
 
 Guidelines for output:
+   - Pay attention to dates, today's date: {TODAY_STR}
    - Use the language of the latest_user_message. 
    - Only include agents whose descriptions are relevant to the question.
    - Always format output as json, following the two options provided above.
@@ -78,7 +83,7 @@ CHAT HISTORY:
 HUMAN LATEST MESSAGE: {latest_user_message}
 
 Your Response:
-"""
+""".replace("{TODAY_STR}", TODAY_STR)
 
 
 SUMMARY_GENERATION_PROMPT_TEMPLATE = """
@@ -91,6 +96,7 @@ without hallucinating or introducing unsupported claims.
 
 ### Rules:
 1. **Relevance Spectrum**:
+   - Pay attention to dates, today's date: {TODAY_STR}
    - Include informations which are relevant or might be helpful for answering user's query.
 
 2. **Faithfulness**:
@@ -121,12 +127,14 @@ User's query:
 {query}
 
 Your answer:
-"""
+""".replace("{TODAY_STR}", TODAY_STR)
 
 
 GENERATION_PROMPT_TEMPLATE = """
 You are an AI Assistant working at Akademia Górniczo-Hutnicza UST in Kraków.
 You are intelligent, confident, and helpful.
+
+Today's date: {TODAY_STR}
 
 Input: 
 Context - Context retrieved from external knowledge.
@@ -160,4 +168,4 @@ CHAT HISTORY:
 {chat_history}
 
 YOUR RESPONSE:
-"""
+""".replace("{TODAY_STR}", TODAY_STR)
