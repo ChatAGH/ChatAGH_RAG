@@ -40,4 +40,5 @@ class InitialRetrievalNode:
             return {"context": []}
 
     def _reranking(self, results):
+        results = sorted(results, key=lambda r: r.metadata["score"], reverse=True)
         return results[:self.num_chunks]

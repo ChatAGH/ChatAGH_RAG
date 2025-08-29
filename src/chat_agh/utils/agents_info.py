@@ -39,8 +39,30 @@ class RetrievalAgentInfo:
 RETRIEVAL_AGENTS = [
     RetrievalAgentInfo(
         name="recrutation_agent",
-        vector_store_index_name="chunks",
-        description="Agent retrieving information about recrutation on AGH University"
+        vector_store_index_name="rekrutacja",
+        description="""
+        Agent wyszukujący informacji dotyczących rekrutacji na AGH na różne typy studiów.
+        Ma dostęp do regulaminów, kalendarzy, aktualnych informacji i wszystkiego co związane z rekrutacją.
+        """
+    ),
+    RetrievalAgentInfo(
+        name="campus_agent",
+        vector_store_index_name="miasteczko",
+        description="""
+        Agent wyszukujący informacji dotyczących kampusu AGH.
+        Ma dostęp do danych o domach studenckich (akademikach), ich przyznawaniu, obowiązujących zasad i regulaminów
+        i wszystkich informacji związanych z życiem na kampusie AGH
+        """,
+    ),
+    RetrievalAgentInfo(
+        name="dss_agent",
+        vector_store_index_name="dss",
+        description="""
+        Agent wyszukujący informacji z działu spraw studenckich AGH.
+        Informacje o procedurach administracyjnych, takich jak składanie wniosków o stypendia,
+         urlopy dziekańskie czy wydawanie zaświadczeń.
+          Dodatkowo często dostępne są wzory dokumentów, regulaminy studiów i informacje dotyczące akademików, pomocy materialnej czy szeroko pojętej działąlności uczelni.
+        """
     )
 ]
 

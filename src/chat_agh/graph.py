@@ -11,7 +11,9 @@ class ChatGraph:
     def __init__(self):
         self.graph = (
             StateGraph(ChatState)
-            .add_node("initial_retrieval_node", InitialRetrievalNode(["chunks"]))
+            .add_node("initial_retrieval_node", InitialRetrievalNode([
+                "rekrutacja", "miasteczko", "dss"
+            ]))
             .add_node("supervisor_node", SupervisorNode())
             .add_node("retrieval_node", RetrievalNode())
             .add_node("generation_node", GenerationNode())
