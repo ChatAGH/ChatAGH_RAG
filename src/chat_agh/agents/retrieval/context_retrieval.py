@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from numpy import array
 from langchain_core.documents import Document
-from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics.pairwise import cosine_similarity # type: ignore
 
 from chat_agh.vector_store.utils import bm25_similarity
 from chat_agh.states import RetrievalState

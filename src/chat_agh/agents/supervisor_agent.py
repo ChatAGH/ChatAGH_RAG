@@ -1,6 +1,6 @@
 import os
 import json
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel, model_validator
 from langchain_core.documents import Document
@@ -54,7 +54,7 @@ class SupervisorAgent:
         )
         self.chain: Runnable = self.prompt | self.llm | self.output_parser
 
-    def invoke(self, agents_info: AgentsInfo, chat_history: ChatHistory, context: list[Document]):
+    def invoke(self, agents_info: AgentsInfo, chat_history: ChatHistory, context: Optional[List[Document]]=None):
         return self.chain.invoke({
             "context": context,
             "agents_info": agents_info,
@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
     from langchain.schema import HumanMessage, AIMessage
 
-    from src.chat_agh.utils.chat_history import ChatHistory
+    from chat_agh.utils.chat_history import ChatHistory
 
     agent = SupervisorAgent()
     res = agent.invoke(

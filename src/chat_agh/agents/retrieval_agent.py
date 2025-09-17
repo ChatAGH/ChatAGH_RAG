@@ -38,4 +38,4 @@ class RetrievalAgent:
 
     def query(self, query: str):
         initial_state = RetrievalState(query=query)
-        return self.graph.invoke(initial_state)["summary"]
+        return self.graph.invoke(initial_state)["summary"] # type: ignore[arg-type]

@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from itertools import chain
+from typing import cast
 
 
 from chat_agh.states import ChatState
@@ -16,7 +17,7 @@ class InitialRetrievalNode:
     @log_execution_time
     def __call__(self, state: ChatState) -> dict:
         chat_history = state["chat_history"]
-        chat_history_text = "".join([message.content for message in chat_history.messages])
+        chat_history_text = "".join([cast(str, message.content) for message in chat_history.messages])
 
         if len(chat_history_text) > 20:
             logger.info(f"Initial retrieval, query: {chat_history_text}")

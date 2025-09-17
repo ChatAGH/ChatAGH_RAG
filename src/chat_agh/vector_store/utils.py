@@ -1,5 +1,5 @@
-from rank_bm25 import BM25Okapi
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize  # type: ignore
+from rank_bm25 import BM25Okapi  # type: ignore
 
 
 def bm25_similarity(text1: str, text2: str) -> float:
@@ -20,7 +20,11 @@ def bm25_similarity(text1: str, text2: str) -> float:
 
     return -bm25.get_scores(query_tokens)[0]
 
-if __name__ == '__main__':
-    score = bm25_similarity("The quick brown fox jumps over the lazy dog",
-                            "A fast brown animal leaped over a sleepy dog")
+
+if __name__ == "__main__":
+    score = bm25_similarity(
+        "The quick brown fox jumps over the lazy dog",
+        "A fast brown animal leaped over a sleepy dog",
+    )
     print(f"BM25 similarity score: {score}")
+

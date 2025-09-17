@@ -1,4 +1,4 @@
-from typing import TypedDict
+from typing import TypedDict, Dict, Any
 
 from langchain_core.documents import Document
 
@@ -6,7 +6,7 @@ from chat_agh.utils.agents_info import AgentsInfo
 from chat_agh.utils.chat_history import ChatHistory
 
 
-class ChatState(TypedDict):
+class ChatState(TypedDict, total=False):
     context: list[Document]
     chat_history: ChatHistory
     agents_info: AgentsInfo
@@ -15,8 +15,8 @@ class ChatState(TypedDict):
     response: str
 
 
-class RetrievalState(TypedDict):
+class RetrievalState(TypedDict, total=False):
     query: str
-    retrieved_chunks: dict
-    retrieved_context: dict
+    retrieved_chunks: Dict[Any, Any]
+    retrieved_context: Dict[Any, Any]
     summary: str
