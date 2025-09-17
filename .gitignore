@@ -1,0 +1,6 @@
+__pycache__/
+.mypy_cache/
+.doit*
+.ruff_cache/
+.pytest_cache/
+.coverage

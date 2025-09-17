@@ -1,5 +1,4 @@
-import os
-from typing import List, Iterable, Union, Optional
+from typing import List, Union, Optional, Dict, Any
 
 from langchain_core.documents import Document
 from chat_agh.utils.utils import mongo_client, embedding_model
@@ -130,7 +129,7 @@ class MongoDBVectorStore:
         }]
 
     def _lexical_pipeline(self, query: str, limit: int, fuzzy: bool, min_should: Optional[int] = None):
-        text_stage = {
+        text_stage: Dict[str, Any] = {
             "index": self.search_index_name,
             "text": {
                 "query": query,
@@ -216,7 +215,7 @@ class MongoDBVectorStore:
             def rrf_score(rank, k_rrf=60):
                 return 1.0 / (k_rrf + rank)
 
-            scores = {}
+            scores: Dict[str, float] = {}
             all_docs = {}
 
             for idx, doc in enumerate(results_dense):

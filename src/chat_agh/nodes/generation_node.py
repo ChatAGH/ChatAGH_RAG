@@ -1,4 +1,7 @@
+from typing import List
+
 from langgraph.config import get_stream_writer
+from langchain_core.documents import Document
 
 from chat_agh.states import ChatState
 from chat_agh.agents import GenerationAgent
@@ -15,9 +18,10 @@ class GenerationNode:
         writer = get_stream_writer()
 
         if any(agent.cached_history for agent in state["agents_info"].agents_details):
-            context = state["agents_info"]
+            context = str(state["agents_info"])
         else:
-            context = state["context"]
+            documents: List[Document] = state["context"]
+            context = "\n".join([document.page_content for document in documents])
 
         args ={
             "context": context,
