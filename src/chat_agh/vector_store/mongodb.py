@@ -128,7 +128,7 @@ class MongoDBVectorStore:
             }
         }]
 
-    def _lexical_pipeline(self, query: str, limit: int, fuzzy: bool, min_should: Optional[int] = None):
+    def _lexical_pipeline(self, query: str, limit: int, fuzzy: bool):
         text_stage: Dict[str, Any] = {
             "index": self.search_index_name,
             "text": {
@@ -142,15 +142,15 @@ class MongoDBVectorStore:
         return pipeline
 
     def search(
-            self,
-            query: str,
-            k: int = 5,
-            mode: str = "hybrid_rrf",  # 'dense' | 'lexical' | 'hybrid_rrf'
-            num_candidates: int = 40,
-            fuzzy: bool = True,
-            vector_weight: float = 1.0,
-            text_weight: float = 1.0,
-            inner_limits: Optional[dict] = None,
+        self,
+        query: str,
+        k: int = 5,
+        mode: str = "hybrid_rrf",  # 'dense' | 'lexical' | 'hybrid_rrf'
+        num_candidates: int = 40,
+        fuzzy: bool = True,
+        vector_weight: float = 1.0,
+        text_weight: float = 1.0,
+        inner_limits: Optional[dict] = None,
     ) -> List[Document]:
         """
         Execute a search query using dense, lexical, or hybrid RRF fusion.

@@ -6,13 +6,21 @@ from typing import cast
 from chat_agh.states import ChatState
 from chat_agh.vector_store.mongodb import MongoDBVectorStore
 from chat_agh.utils.utils import log_execution_time, logger
+from chat_agh.utils.agents_info import RETRIEVAL_AGENTS
 
 
 class InitialRetrievalNode:
-    def __init__(self, collections: list[str], num_chunks: int = 5, k: int = 5):
+    def __init__(
+        self,
+        collections: list[str] | None = None,
+        num_chunks: int = 5,
+        k: int = 5
+    ):
         self.num_chunks = num_chunks
-        self.vector_stores = [MongoDBVectorStore(collection) for collection in collections]
         self.k = k
+        if not collections:
+            collections = [a.vector_store_index_name for a in RETRIEVAL_AGENTS]
+        self.vector_stores = [MongoDBVectorStore(collection) for collection in collections]
 
     @log_execution_time
     def __call__(self, state: ChatState) -> dict:
