@@ -38,6 +38,3 @@ source = ["src/chat_agh"]
 
 [tool.coverage.report]
 show_missing = true
-
-[project.scripts]
-PYTHONPATH = "src/chat_agh"
