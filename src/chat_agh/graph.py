@@ -121,13 +121,10 @@ class ChatGraph:
 
 
 if __name__ == "__main__":
-    from chat_agh.utils.utils import logger
-
     chat_graph = ChatGraph()
-
     chat_history = ChatHistory(
         messages=[HumanMessage("Jak zostać studentem AGH?")]
     )
-    logger.info("START")
+
     for c in chat_graph.stream(chat_history):
         print(c)
