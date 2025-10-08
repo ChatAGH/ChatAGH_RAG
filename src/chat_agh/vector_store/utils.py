@@ -1,5 +1,7 @@
-from nltk.tokenize import word_tokenize  # type: ignore
-from rank_bm25 import BM25Okapi  # type: ignore
+from typing import Sequence, cast
+
+from nltk.tokenize import word_tokenize
+from rank_bm25 import BM25Okapi
 
 
 def bm25_similarity(text1: str, text2: str) -> float:
@@ -17,8 +19,9 @@ def bm25_similarity(text1: str, text2: str) -> float:
     query_tokens = word_tokenize(text2.lower())
 
     bm25 = BM25Okapi([doc_tokens])
+    scores = cast(Sequence[float], bm25.get_scores(query_tokens))
 
-    return -bm25.get_scores(query_tokens)[0]
+    return -scores[0]
 
 
 if __name__ == "__main__":
@@ -27,4 +30,3 @@ if __name__ == "__main__":
         "A fast brown animal leaped over a sleepy dog",
     )
     print(f"BM25 similarity score: {score}")
-

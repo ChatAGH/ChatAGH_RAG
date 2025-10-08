@@ -14,8 +14,8 @@ Context:
    - Context retrieved from knowledge base related to the conversation.
    - Formatted as:
        Source URL: URL of the source
-       Content: 
-       
+       Content:
+
 2. Agents:
    - Each agent is a specialized retrieval system that can access specific sources of knowledge.
    - An agent’s purpose is to answer queries by retrieving relevant information from these sources.
@@ -35,17 +35,17 @@ Instructions:
    Return json: {{
        "retrieval_decision": False,
    }}
-   
+
 2. If the latest_user_message is a general knowledge question, which can be answered based on your knowledge:
    Return json: {{
        "retrieval_decision": False,
    }}
-   
+
 3. If the latest_user_message is unclear, contains too less information to reliably answer:
    Return json: {{
        "retrieval_decision": False,
    }}
-   
+
 4. if the latest_user_message is a question which can be answered based on provided context:
    Return json: {{
        "retrieval_decision": False,
@@ -53,8 +53,8 @@ Instructions:
 
 1. If the latest_user_message requires additional information and based on the conversation you know what to ask for:
    - Identify the most relevant agent(s) based on their description and previous retrieved context.
-   - Formulate precise, comprehensive queries for each selected agent to retrieve the information needed. The query should contain all information required to find proper source. 
-   - Question should contain a lot of phrases, words related to the question. More informations in the query is more accurate retrieval. 
+   - Formulate precise, comprehensive queries for each selected agent to retrieve the information needed. The query should contain all information required to find proper source.
+   - Question should contain a lot of phrases, words related to the question. More informations in the query is more accurate retrieval.
    - Return:
    {{
        "retrieval_decision": True,
@@ -67,7 +67,7 @@ Instructions:
 
 Guidelines for output:
    - Pay attention to dates, today's date: {TODAY_STR}
-   - Use the language of the latest_user_message. 
+   - Use the language of the latest_user_message.
    - Only include agents whose descriptions are relevant to the question.
    - Always format output as json, following the two options provided above.
 
@@ -89,9 +89,9 @@ Your Response:
 SUMMARY_GENERATION_PROMPT_TEMPLATE = """
 You are a research assistant specialized in evidence-grounded information extraction and synthesis.
 
-Your task is to analyze a user query and a collection of retrieved text chunks. 
-Each chunk includes both text and a source URL. 
-You must extract and summarize **all information that is relevant or even loosely related to the query**, 
+Your task is to analyze a user query and a collection of retrieved text chunks.
+Each chunk includes both text and a source URL.
+You must extract and summarize **all information that is relevant or even loosely related to the query**,
 without hallucinating or introducing unsupported claims.
 
 ### Rules:
@@ -102,7 +102,7 @@ without hallucinating or introducing unsupported claims.
 2. **Faithfulness**:
    - Use only information present in the chunks.
    - Do not infer or invent new facts beyond what is stated.
-   - If the provided chunks contain no relevant information, state clearly: 
+   - If the provided chunks contain no relevant information, state clearly:
      *“No relevant information was found in the retrieved documents.”*
 
 4. **Summary Style**:
@@ -136,7 +136,7 @@ You are intelligent, confident, and helpful.
 
 Today's date: {TODAY_STR}
 
-Input: 
+Input:
 Context - Context retrieved from external knowledge.
 ChatHistory - History of conversation between you and user.
 
@@ -156,11 +156,11 @@ Instructions:
 
 4. if the latest_user_message is a question which can be answered based on provided context:
    - Use the available context, do NOT make up facts. If you don’t know the answer, say so.
-   - Naturally respond to the latest user's message, provide the reliable answer if it is a question. 
+   - Naturally respond to the latest user's message, provide the reliable answer if it is a question.
    - Include links to source on which you are basing you response.
    - If the answer is long, format it in markdown.
    - Ask the user if he needs to you to find any details about provided informations.
-   
+
 AGENTS RETRIEVED CONTEXT:
 {context}
 
