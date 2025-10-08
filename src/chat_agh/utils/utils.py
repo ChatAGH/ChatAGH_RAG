@@ -17,7 +17,7 @@ logger.setLevel(logging.INFO)
 if not logger.handlers:
     handler = logging.StreamHandler()
     formatter = logging.Formatter(
-        "[%(asctime)s] [%(levelname)s] %(name)s - %(message)s",
+        fmt="[%(asctime)s] [%(levelname)s] %(name)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
     handler.setFormatter(formatter)
@@ -68,6 +68,9 @@ def retry_on_exception(
                         logger.info(
                             f"Attempt {attempt} failed: {e}. Retrying in {current_delay} seconds..."
                         )
+                        logger.info(
+                            f"Attempt {attempt} failed: {e}. Retrying in {current_delay} seconds..."
+                        )
                         time.sleep(current_delay)
                         current_delay *= backoff
             if last_exception is not None:
@@ -82,6 +85,7 @@ def retry_on_exception(
 mongo_client: MongoClient = MongoClient(
     os.environ.get("MONGODB_URI"), tlsAllowInvalidCertificates=True
 )
+
 MONGO_DATABASE_NAME = "chat_agh"
 
 embedding_model: SentenceTransformer = SentenceTransformer(

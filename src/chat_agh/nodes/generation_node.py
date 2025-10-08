@@ -19,6 +19,7 @@ class GenerationNode:
 
         if any(agent.cached_history for agent in state["agents_info"].agents_details):
             context = str(state["agents_info"])
+            context = str(state["agents_info"])
         else:
             documents: List[Document] = state["context"]
             context = "\n".join([document.page_content for document in documents])

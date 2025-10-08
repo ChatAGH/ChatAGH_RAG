@@ -87,6 +87,7 @@ if __name__ == "__main__":
     from langchain.schema import HumanMessage, AIMessage
 
     from chat_agh.utils.chat_history import ChatHistory
+    from chat_agh.utils.chat_history import ChatHistory
 
     agent = SupervisorAgent()
     res = agent.invoke(
