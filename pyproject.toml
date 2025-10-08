@@ -28,6 +28,7 @@ black = "^25.1.0"
 mypy = "^1.18.1"
 ruff = "^0.13.0"
 coverage = "^7.10.6"
+pre-commit = "^3.7.0"
 
 [tool.poetry]
 package-mode = false
@@ -38,3 +39,6 @@ source = ["src/chat_agh"]
 
 [tool.coverage.report]
 show_missing = true
+
+[project.scripts]
+PYTHONPATH = "src/chat_agh"

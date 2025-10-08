@@ -1,27 +1,29 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Dict, List
 
-from chat_agh.utils.utils import logger, log_execution_time
 from chat_agh.agents.retrieval_agent import RetrievalAgent
 from chat_agh.states import ChatState
-from chat_agh.utils.agents_info import AgentsInfo, AgentDetails, RETRIEVAL_AGENTS
+from chat_agh.utils.agents_info import AgentDetails, AgentsInfo, RETRIEVAL_AGENTS
+from chat_agh.utils.utils import log_execution_time, logger
 
 
 class RetrievalNode:
-    def __init__(self):
-        self.retrieval_agents = [
+    def __init__(self) -> None:
+        self.retrieval_agents: List[RetrievalAgent] = [
             RetrievalAgent(
                 agent_name=agent_info.name,
                 index_name=agent_info.vector_store_index_name,
                 description=agent_info.description,
-            ) for agent_info in RETRIEVAL_AGENTS
+            )
+            for agent_info in RETRIEVAL_AGENTS
         ]
 
     @log_execution_time
-    def __call__(self, state: ChatState) -> dict:
+    def __call__(self, state: ChatState) -> Dict[str, AgentsInfo]:
         queries = state["agents_queries"]
-        responses = []
+        responses: List[AgentDetails] = []
 
-        def query_agent(agent, query):
+        def query_agent(agent: RetrievalAgent, query: str) -> AgentDetails:
             logger.info(f"Querying agent: {agent.name}. Query: {query}")
             agent_response = agent.query(query)
             logger.info(f"Agent response: {agent_response}")
@@ -31,7 +33,7 @@ class RetrievalNode:
                 cached_history={
                     "query": query,
                     "response": agent_response,
-                }
+                },
             )
 
         futures = []

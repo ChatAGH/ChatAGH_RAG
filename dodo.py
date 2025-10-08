@@ -1,4 +1,7 @@
-def task_doit():
+from typing import Any
+
+
+def task_doit() -> dict[str, Any]:
     """
     Run static type checks, formatting, linting,
     coverage measurement, and unit tests.
@@ -13,7 +16,7 @@ def task_doit():
             "poetry run ruff check . --fix",
             # 4. Test coverage (will also run pytest)
             "poetry run coverage run -m pytest tests",
-            "poetry run coverage report -m", # show uncovered files
+            "poetry run coverage report -m",  # show uncovered files
             "poetry run coverage html",
         ],
         "verbosity": 2,

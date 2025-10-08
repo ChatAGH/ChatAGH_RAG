@@ -1,11 +1,13 @@
+from typing import Any, Dict, cast
+
 from langgraph.graph.state import StateGraph
 
-from chat_agh.states import RetrievalState
 from chat_agh.agents.retrieval import (
-    SimilaritySearch,
     ContextRetrieval,
-    SummaryGeneration
+    SimilaritySearch,
+    SummaryGeneration,
 )
+from chat_agh.states import RetrievalState
 
 
 class RetrievalAgent:
@@ -16,19 +18,24 @@ class RetrievalAgent:
         description: str,
         num_retrieved_chunks: int = 8,
         num_context_chunks: int = 3,
-        window_size: int = 1
-    ):
+        window_size: int = 1,
+    ) -> None:
         self.name = agent_name
         self.index_name = index_name
         self.description = description
         self.graph = (
             StateGraph(RetrievalState)
-            .add_node("similarity_search", SimilaritySearch(
-                index_name=self.index_name,
-                num_retrieved_chunks=num_retrieved_chunks,
-                window_size=window_size
-            ))
-            .add_node("context_retrieval", ContextRetrieval(num_chunks=num_context_chunks))
+            .add_node(
+                "similarity_search",
+                SimilaritySearch(
+                    index_name=self.index_name,
+                    num_retrieved_chunks=num_retrieved_chunks,
+                    window_size=window_size,
+                ),
+            )
+            .add_node(
+                "context_retrieval", ContextRetrieval(num_chunks=num_context_chunks)
+            )
             .add_node("summary_generation", SummaryGeneration())
             .add_edge("similarity_search", "context_retrieval")
             .add_edge("context_retrieval", "summary_generation")
@@ -36,6 +43,10 @@ class RetrievalAgent:
             .compile()
         )
 
-    def query(self, query: str):
+    def query(self, query: str) -> str:
         initial_state = RetrievalState(query=query)
-        return self.graph.invoke(initial_state)["summary"] # type: ignore[arg-type]
+        result = cast(Dict[str, Any], self.graph.invoke(initial_state))
+        summary = result.get("summary")
+        if not isinstance(summary, str):
+            raise TypeError("RetrievalAgent expected summary to be a string")
+        return summary
