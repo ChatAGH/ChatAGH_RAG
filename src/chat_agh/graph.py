@@ -1,5 +1,5 @@
 from collections.abc import Generator
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 from langchain_core.messages import HumanMessage
 from langgraph.graph.state import END, START, StateGraph
@@ -53,7 +53,7 @@ class ChatGraph:
         state = ChatState(
             chat_history=chat_history, agents_info=self._get_agents_info()
         )
-        result = cast(Dict[str, Any], self.graph.invoke(state))
+        result = cast(dict[str, Any], self.graph.invoke(state))
         response = result.get("response")
         if not isinstance(response, str):
             raise TypeError("ChatGraph expected response to be a string")
