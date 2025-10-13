@@ -1,34 +1,40 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Any, Callable, Dict, Iterable, List
 
-from numpy import array
 from langchain_core.documents import Document
-from sklearn.metrics.pairwise import cosine_similarity # type: ignore
+from numpy import array
+from pymongo.collection import Collection
+from sklearn.metrics.pairwise import cosine_similarity
 
-from chat_agh.vector_store.utils import bm25_similarity
+from chat_agh.agents.retrieval.utils import aggregate_by_url
 from chat_agh.states import RetrievalState
 from chat_agh.utils.utils import (
-    mongo_client,
     MONGO_DATABASE_NAME,
-    embedding_model,
-    logger,
     RetrievedContext,
-    log_execution_time
+    embedding_model,
+    log_execution_time,
+    logger,
+    mongo_client,
 )
-from chat_agh.agents.retrieval.utils import aggregate_by_url
+from chat_agh.vector_store.utils import bm25_similarity
 
 
 class ContextRetrieval:
-    def __init__(self, num_chunks: int = 2):
+    def __init__(self, num_chunks: int = 2) -> None:
         self.num_chunks = num_chunks
-        self.graph_edges_collection = mongo_client[MONGO_DATABASE_NAME]["edges"]
-        self.chunks_collection = mongo_client[MONGO_DATABASE_NAME]["chunks"]
+        self.graph_edges_collection: Collection[Dict[str, Any]] = mongo_client[
+            MONGO_DATABASE_NAME
+        ]["edges"]
+        self.chunks_collection: Collection[Dict[str, Any]] = mongo_client[
+            MONGO_DATABASE_NAME
+        ]["chunks"]
 
     @log_execution_time
-    def __call__(self, state: RetrievalState):
-        retrieved_chunks = state["retrieved_chunks"]
-        contexts = []
+    def __call__(self, state: RetrievalState) -> Dict[str, List[RetrievedContext]]:
+        retrieved_chunks: Dict[str, List[Document]] = state["retrieved_chunks"]
+        contexts: List[RetrievedContext] = []
 
-        def process(url, chunks):
+        def process(url: str, chunks: List[Document]) -> RetrievedContext:
             related_chunks = self.process_single_url(url, chunks)
             return RetrievedContext(
                 source_url=url,
@@ -46,21 +52,28 @@ class ContextRetrieval:
 
         return {"retrieved_context": contexts}
 
-    def process_single_url(self, url, retrieved_chunks) -> dict:
+    def process_single_url(
+        self, url: str, retrieved_chunks: List[Document]
+    ) -> Dict[str, List[Document]]:
         retrieved_context = " ".join([d.page_content for d in retrieved_chunks])
 
         related_urls = self._find_related_urls(url)
         logger.info("Found {} related URLs for {}".format(len(related_urls), url))
 
-        chunks = []
+        chunks: List[Document] = []
         with ThreadPoolExecutor() as executor:
-            futures = {executor.submit(self._get_chunks_for_url, url): url for url in related_urls}
+            futures = {
+                executor.submit(self._get_chunks_for_url, url): url
+                for url in related_urls
+            }
             for future in as_completed(futures):
                 new_chunks = future.result()
                 chunks.extend([c for c in new_chunks if c not in retrieved_chunks])
 
         if chunks:
-            context_embedding = embedding_model.encode([retrieved_context]).tolist()
+            context_embedding: List[float] = embedding_model.encode(
+                [retrieved_context]
+            ).tolist()
             related_chunks = self._combined_similarity(
                 retrieved_context=retrieved_context,
                 retrieved_context_embedding=context_embedding,
@@ -73,18 +86,15 @@ class ContextRetrieval:
         else:
             return {}
 
-    def _find_related_urls(self, node: str):
+    def _find_related_urls(self, node: str) -> List[str]:
         """Get list of all related urls for a given url."""
         collection = self.graph_edges_collection
 
-        results = collection.find({
-            "$or": [
-                {"source": node},
-                {"target": node}
-            ]
-        })
+        results: Iterable[Dict[str, Any]] = collection.find(
+            {"$or": [{"source": node}, {"target": node}]}
+        )
 
-        related_nodes = set(node)
+        related_nodes: set[str] = {node}
         for doc in results:
             if doc["source"] == node:
                 related_nodes.add(doc["target"])
@@ -93,22 +103,26 @@ class ContextRetrieval:
 
         return list(related_nodes)
 
-    def _get_chunks_for_url(self, url: str):
+    def _get_chunks_for_url(self, url: str) -> List[Document]:
         """Returns all chunks for a given url."""
         chunks = list(self.chunks_collection.find({"metadata.url": url}))
         return [
-            Document(page_content=d["text"], metadata=d["metadata"] | {"embedding": d["embedding"]}) for d in chunks
+            Document(
+                page_content=d["text"],
+                metadata=d["metadata"] | {"embedding": d["embedding"]},
+            )
+            for d in chunks
         ]
 
     def _combined_similarity(
         self,
         retrieved_context: str,
-        retrieved_context_embedding: list[float],
-        chunks: list[Document],
-        bm25_similarity_func,
+        retrieved_context_embedding: List[float],
+        chunks: List[Document],
+        bm25_similarity_func: Callable[[str, str], float],
         bm25_weight: float = 0.5,
-        top_n: int = 5
-    ) -> list[dict]:
+        top_n: int = 5,
+    ) -> List[Dict[str, Any]]:
         """
         Combines BM25 and embedding-based similarity to rank chunks.
 
@@ -126,13 +140,17 @@ class ContextRetrieval:
         summary_embedding = array(retrieved_context_embedding).reshape(1, -1)
         chunk_embeddings = array([chunk.metadata["embedding"] for chunk in chunks])
 
-        embedding_similarities = cosine_similarity(summary_embedding, chunk_embeddings)[0]
+        embedding_similarities = cosine_similarity(summary_embedding, chunk_embeddings)[
+            0
+        ]
 
-        combined_scores = []
+        combined_scores: List[tuple[int, float]] = []
         for idx, chunk in enumerate(chunks):
             bm25_score = bm25_similarity_func(retrieved_context, chunk.page_content)
             embedding_score = embedding_similarities[idx]
-            combined_score = bm25_weight * bm25_score + (1 - bm25_weight) * embedding_score
+            combined_score = (
+                bm25_weight * bm25_score + (1 - bm25_weight) * embedding_score
+            )
             combined_scores.append((idx, combined_score))
 
         top_indices = sorted(combined_scores, key=lambda x: x[1], reverse=True)[:top_n]
@@ -141,7 +159,9 @@ class ContextRetrieval:
             {
                 "chunk": chunks[i],
                 "combined_score": score,
-                "bm25_score": bm25_similarity_func(retrieved_context, chunks[i].page_content),
+                "bm25_score": bm25_similarity_func(
+                    retrieved_context, chunks[i].page_content
+                ),
                 "embedding_score": embedding_similarities[i],
             }
             for i, score in top_indices

@@ -12,7 +12,7 @@ class AgentsInfo:
     def __init__(self, agents_details: list[AgentDetails]):
         self.agents_details = agents_details
 
-    def __str__(self):
+    def __str__(self) -> str:
         text = ""
         for detail in self.agents_details:
             text += (
@@ -43,7 +43,7 @@ RETRIEVAL_AGENTS = [
         description="""
         Agent wyszukujący informacji dotyczących rekrutacji na AGH na różne typy studiów.
         Ma dostęp do regulaminów, kalendarzy, aktualnych informacji i wszystkiego co związane z rekrutacją.
-        """
+        """,
     ),
     RetrievalAgentInfo(
         name="campus_agent",
@@ -62,7 +62,6 @@ RETRIEVAL_AGENTS = [
         Informacje o procedurach administracyjnych, takich jak składanie wniosków o stypendia,
          urlopy dziekańskie czy wydawanie zaświadczeń.
           Dodatkowo często dostępne są wzory dokumentów, regulaminy studiów i informacje dotyczące akademików, pomocy materialnej czy szeroko pojętej działąlności uczelni.
-        """
-    )
+        """,
+    ),
 ]
-
