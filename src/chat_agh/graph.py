@@ -26,11 +26,7 @@ class ChatGraph:
             StateGraph(ChatState)
             .add_node(
                 "initial_retrieval_node",
-                InitialRetrievalNode(["rekrutacja", "miasteczko", "dss"]),
-            )
-            .add_node(
-                "initial_retrieval_node",
-                InitialRetrievalNode(["rekrutacja", "miasteczko", "dss"]),
+                InitialRetrievalNode(["cluster_0"]),
             )
             .add_node("supervisor_node", SupervisorNode())
             .add_node("retrieval_node", RetrievalNode())
