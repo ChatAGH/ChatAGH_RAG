@@ -51,7 +51,7 @@ Instructions:
        "retrieval_decision": False,
    }}
 
-1. If the latest_user_message requires additional information and based on the conversation you know what to ask for:
+5. If the latest_user_message requires additional information and based on the conversation you know what to ask for:
    - Identify the most relevant agent(s) based on their description and previous retrieved context.
    - Formulate precise, comprehensive queries for each selected agent to retrieve the information needed. The query should contain all information required to find proper source.
    - Question should contain a lot of phrases, words related to the question. More informations in the query is more accurate retrieval.

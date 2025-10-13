@@ -14,13 +14,7 @@ class ChatHistory:
             )
         return messages
 
-    @overload
-    def __getitem__(self, item: int) -> BaseMessage: ...
-
-    @overload
-    def __getitem__(self, item: slice) -> "ChatHistory": ...
-
-    def __getitem__(self, item: int | slice) -> BaseMessage | "ChatHistory":
+    def __getitem__(self, item: int | slice) -> "BaseMessage | ChatHistory":
         if isinstance(item, slice):
             return ChatHistory(self.messages[item])
         else:

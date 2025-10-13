@@ -16,7 +16,7 @@ class RetrievalAgent:
         agent_name: str,
         index_name: str,
         description: str,
-        num_retrieved_chunks: int = 8,
+        num_retrieved_chunks: int = 5,
         num_context_chunks: int = 3,
         window_size: int = 1,
     ) -> None:
@@ -46,7 +46,7 @@ class RetrievalAgent:
     def query(self, query: str) -> str:
         initial_state = RetrievalState(query=query)
         result = cast(Dict[str, Any], self.graph.invoke(initial_state))
-        summary = result.get("summary")
+        summary = result.get("summary").content
         if not isinstance(summary, str):
             raise TypeError("RetrievalAgent expected summary to be a string")
         return summary

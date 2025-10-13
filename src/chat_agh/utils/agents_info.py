@@ -38,30 +38,34 @@ class RetrievalAgentInfo:
 
 RETRIEVAL_AGENTS = [
     RetrievalAgentInfo(
-        name="recrutation_agent",
-        vector_store_index_name="rekrutacja",
+        name="main_agent",
+        vector_store_index_name="cluster_0",
         description="""
-        Agent wyszukujący informacji dotyczących rekrutacji na AGH na różne typy studiów.
-        Ma dostęp do regulaminów, kalendarzy, aktualnych informacji i wszystkiego co związane z rekrutacją.
+        Agent pobierający informację z głównej strony agh, na której znajdują się podstawowe informacje o uczelni i
+        przekierowania do innych domen/informacji. Zawiera również informacje z Centurm Obsługi Kształcenia
+        gdzie można znaleźć informacje dotyczące organizacji i koordynacji procesu kształcenia na studiach wyższych i podyplomowych,
+        w tym obsługi systemu USOS, zasad i procedur dydaktycznych oraz wsparcia technicznego dla jednostek uczelni.
+        
+        Agent obsługuje następujące domeny:
+        - agh.edu.pl
+        - cok.agh.edu.pl
         """,
     ),
     RetrievalAgentInfo(
         name="campus_agent",
-        vector_store_index_name="miasteczko",
+        vector_store_index_name="cluster_1",
         description="""
-        Agent wyszukujący informacji dotyczących kampusu AGH.
-        Ma dostęp do danych o domach studenckich (akademikach), ich przyznawaniu, obowiązujących zasad i regulaminów
-        i wszystkich informacji związanych z życiem na kampusie AGH
+        Agent Wydziału Humanistycznego AGH
         """,
     ),
-    RetrievalAgentInfo(
-        name="dss_agent",
-        vector_store_index_name="dss",
-        description="""
-        Agent wyszukujący informacji z działu spraw studenckich AGH.
-        Informacje o procedurach administracyjnych, takich jak składanie wniosków o stypendia,
-         urlopy dziekańskie czy wydawanie zaświadczeń.
-          Dodatkowo często dostępne są wzory dokumentów, regulaminy studiów i informacje dotyczące akademików, pomocy materialnej czy szeroko pojętej działąlności uczelni.
-        """,
-    ),
+    # RetrievalAgentInfo(
+    #     name="dss_agent",
+    #     vector_store_index_name="dss",
+    #     description="""
+    #     Agent wyszukujący informacji z działu spraw studenckich AGH.
+    #     Informacje o procedurach administracyjnych, takich jak składanie wniosków o stypendia,
+    #      urlopy dziekańskie czy wydawanie zaświadczeń.
+    #       Dodatkowo często dostępne są wzory dokumentów, regulaminy studiów i informacje dotyczące akademików, pomocy materialnej czy szeroko pojętej działąlności uczelni.
+    #     """,
+    # ),
 ]
