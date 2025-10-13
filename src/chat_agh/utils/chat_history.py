@@ -1,6 +1,6 @@
-from typing import overload
+from typing import Union, overload
 
-from langchain.schema import BaseMessage
+from langchain_core.messages import BaseMessage
 
 
 class ChatHistory:
@@ -19,7 +19,7 @@ class ChatHistory:
             return ChatHistory(self.messages[item])
         else:
             return self.messages[item]
-
+          
     def __str__(self) -> str:
         return "\n".join(
             f"  {msg.type.upper()} MESSAGE: {msg.content}" for msg in self.messages

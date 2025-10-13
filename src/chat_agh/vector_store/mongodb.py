@@ -1,8 +1,9 @@
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Union, cast
 
 from langchain_core.documents import Document
-from chat_agh.utils.utils import mongo_client, embedding_model
 from pymongo.results import InsertManyResult
+
+from chat_agh.utils.utils import embedding_model, logger, mongo_client
 
 
 class MongoDBVectorStore:
@@ -32,6 +33,7 @@ class MongoDBVectorStore:
         create_indexes: bool = True,
     ):
         self.collection = mongo_client[db_name][collection_name]
+        logger.info("Initiating Mongo Client")
 
         # Embeddings
         self.dense_model = embedding_model

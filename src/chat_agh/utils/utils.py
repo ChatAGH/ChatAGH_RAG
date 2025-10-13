@@ -6,12 +6,10 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import ParamSpec, TypeVar
 
-from dotenv import load_dotenv
 from langchain_core.documents import Document
 from pymongo import MongoClient
 from sentence_transformers import SentenceTransformer
 
-load_dotenv("/Users/wnowogorski/PycharmProjects/ChatAGH_RAG/.env")
 logger = logging.getLogger("chat_graph_logger")
 logger.setLevel(logging.INFO)
 if not logger.handlers:

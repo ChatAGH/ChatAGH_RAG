@@ -1,5 +1,6 @@
 from collections.abc import Generator
-from typing import Any, Dict, cast
+from typing import Any, cast
+from chat_agh.utils.utils import logger
 
 from langchain_core.messages import HumanMessage
 from langgraph.graph.state import END, START, StateGraph
@@ -27,6 +28,10 @@ class ChatGraph:
                 "initial_retrieval_node",
                 InitialRetrievalNode(["cluster_0"]),
             )
+            .add_node(
+                "initial_retrieval_node",
+                InitialRetrievalNode(["rekrutacja", "miasteczko", "dss"]),
+            )
             .add_node("supervisor_node", SupervisorNode())
             .add_node("retrieval_node", RetrievalNode())
             .add_node("generation_node", GenerationNode())
@@ -53,7 +58,7 @@ class ChatGraph:
         state = ChatState(
             chat_history=chat_history, agents_info=self._get_agents_info()
         )
-        result = cast(Dict[str, Any], self.graph.invoke(state))
+        result = cast(dict[str, Any], self.graph.invoke(state))
         response = result.get("response")
         if not isinstance(response, str):
             raise TypeError("ChatGraph expected response to be a string")
@@ -83,8 +88,6 @@ class ChatGraph:
 
 
 if __name__ == "__main__":
-    from chat_agh.utils.utils import logger
-
     chat_graph = ChatGraph()
 
     chat_history = ChatHistory(messages=[HumanMessage("Jak zostać studentem AGH?")])

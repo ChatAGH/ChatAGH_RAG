@@ -14,7 +14,6 @@ repos:
       - id: mypy
         args: [--strict, --ignore-missing-imports]
         additional_dependencies:
-        - django-stubs
         - python-dotenv
         - langchain-core
 -   repo: https://github.com/astral-sh/ruff-pre-commit
