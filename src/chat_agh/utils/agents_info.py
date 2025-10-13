@@ -52,7 +52,7 @@ RETRIEVAL_AGENTS = [
         """,
     ),
     RetrievalAgentInfo(
-        name="campus_agent",
+        name="wh_agent",
         vector_store_index_name="cluster_1",
         description="""
         Agent Wydziału Humanistycznego AGH
