@@ -56,6 +56,12 @@ RETRIEVAL_AGENTS = [
         vector_store_index_name="cluster_1",
         description="""
         Agent Wydziału Humanistycznego AGH
+        
+        Agent obsługuje następujące domeny:
+        - wh.agh.edu.pl
+        - power.3.5.wh.agh.edu.pl
+        - konfpau.wh.agh.edu.pl
+        - multisite.wh.agh.edu.pl
         """,
     ),
     # RetrievalAgentInfo(
