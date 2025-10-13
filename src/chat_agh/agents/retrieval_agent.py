@@ -1,5 +1,3 @@
-from typing import Any, Dict, cast
-
 from langgraph.graph.state import StateGraph
 
 from chat_agh.agents.retrieval import (
@@ -45,7 +43,7 @@ class RetrievalAgent:
 
     def query(self, query: str) -> str:
         initial_state = RetrievalState(query=query)
-        result = cast(Dict[str, Any], self.graph.invoke(initial_state))
+        result = self.graph.invoke(initial_state)
         summary = result.get("summary").content
 
         if not isinstance(summary, str):
