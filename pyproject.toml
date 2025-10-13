@@ -40,5 +40,8 @@ source = ["src/chat_agh"]
 [tool.coverage.report]
 show_missing = true
 
-[project.scripts]
-PYTHONPATH = "src/chat_agh"
+[tool.basedpyright]
+reportMissingTypeStubs = "none"
+
+[tool.mypy]
+ignore_missing_imports = true

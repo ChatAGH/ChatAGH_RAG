@@ -1,6 +1,6 @@
-from typing import overload
+from typing import Union, overload
 
-from langchain.schema import BaseMessage
+from langchain_core.messages import BaseMessage
 
 
 class ChatHistory:
@@ -18,13 +18,12 @@ class ChatHistory:
     def __getitem__(self, item: int) -> BaseMessage: ...
 
     @overload
-    def __getitem__(self, item: slice) -> "ChatHistory": ...
+    def __getitem__(self, item: slice) -> list[BaseMessage]: ...
 
-    def __getitem__(self, item: int | slice) -> BaseMessage | "ChatHistory":
-        if isinstance(item, slice):
-            return ChatHistory(self.messages[item])
-        else:
-            return self.messages[item]
+    def __getitem__(
+        self, item: Union[int, slice]
+    ) -> Union[BaseMessage, list[BaseMessage]]:
+        return self.messages[item]
 
     def __str__(self) -> str:
         return "\n".join(

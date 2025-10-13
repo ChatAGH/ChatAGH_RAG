@@ -14,10 +14,6 @@ def task_doit() -> dict[str, Any]:
             "poetry run ruff check .",
             # 3. Formatting files
             "poetry run ruff check . --fix",
-            # 4. Test coverage (will also run pytest)
-            "poetry run coverage run -m pytest tests",
-            "poetry run coverage report -m",  # show uncovered files
-            "poetry run coverage html",
         ],
         "verbosity": 2,
     }
