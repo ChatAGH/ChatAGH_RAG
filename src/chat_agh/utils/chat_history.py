@@ -1,3 +1,5 @@
+from typing import Union, overload
+
 from langchain_core.messages import BaseMessage
 
 
@@ -12,7 +14,15 @@ class ChatHistory:
             )
         return messages
 
-    def __getitem__(self, item: int) -> BaseMessage:
+    @overload
+    def __getitem__(self, item: int) -> BaseMessage: ...
+
+    @overload
+    def __getitem__(self, item: slice) -> list[BaseMessage]: ...
+
+    def __getitem__(
+        self, item: Union[int, slice]
+    ) -> Union[BaseMessage, list[BaseMessage]]:
         return self.messages[item]
 
     def __str__(self) -> str:

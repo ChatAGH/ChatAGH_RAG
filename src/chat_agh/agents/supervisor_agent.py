@@ -1,18 +1,18 @@
 import json
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, model_validator
+from langchain.schema import BaseMessage
 from langchain_core.documents import Document
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import Runnable
 from langchain_google_genai import ChatGoogleGenerativeAI
+from pydantic import BaseModel, model_validator
 
 from chat_agh.prompts import SUPERVISOR_AGENT_PROMPT_TEMPLATE
-from chat_agh.utils.agents_info import AgentDetails, AgentsInfo, RETRIEVAL_AGENTS
+from chat_agh.utils.agents_info import RETRIEVAL_AGENTS, AgentDetails, AgentsInfo
 from chat_agh.utils.chat_history import ChatHistory
-
 
 DEFAULT_SUPERVISOR_MODEL = "gemini-2.5-flash"
 
@@ -59,9 +59,9 @@ class SupervisorAgent:
             input_variables=["agents_info", "chat_history", "latest_user_message"],
             template=SUPERVISOR_AGENT_PROMPT_TEMPLATE,
         )
-        self.chain: Runnable[Dict[str, Any], SupervisorOutput] = (
-            self.prompt | self.llm | self.output_parser
-        )
+        self.chain: Runnable[
+            Dict[str, Union[Any, BaseMessage, list[BaseMessage]]], SupervisorOutput
+        ] = self.prompt | self.llm | self.output_parser
 
     def invoke(
         self,
@@ -84,9 +84,8 @@ if __name__ == "__main__":
 
     load_dotenv("/.env")
 
-    from langchain.schema import HumanMessage, AIMessage
+    from langchain.schema import AIMessage, HumanMessage
 
-    from chat_agh.utils.chat_history import ChatHistory
     from chat_agh.utils.chat_history import ChatHistory
 
     agent = SupervisorAgent()
