@@ -1,5 +1,6 @@
 from collections.abc import Generator
 from typing import Any, cast
+from chat_agh.utils.utils import logger
 
 from langchain_core.messages import HumanMessage
 from langgraph.graph.state import END, START, StateGraph
@@ -23,6 +24,10 @@ class ChatGraph:
     def __init__(self) -> None:
         self.graph: Any = (
             StateGraph(ChatState)
+            .add_node(
+                "initial_retrieval_node",
+                InitialRetrievalNode(["rekrutacja", "miasteczko", "dss"]),
+            )
             .add_node(
                 "initial_retrieval_node",
                 InitialRetrievalNode(["rekrutacja", "miasteczko", "dss"]),
@@ -83,8 +88,6 @@ class ChatGraph:
 
 
 if __name__ == "__main__":
-    from chat_agh.utils.utils import logger
-
     chat_graph = ChatGraph()
 
     chat_history = ChatHistory(messages=[HumanMessage("Jak zostać studentem AGH?")])
