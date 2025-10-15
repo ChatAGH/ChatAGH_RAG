@@ -1,6 +1,5 @@
 from collections.abc import Generator
 from typing import Any, cast
-from chat_agh.utils.utils import logger
 
 from langchain_core.messages import HumanMessage
 from langgraph.graph.state import END, START, StateGraph
@@ -18,6 +17,7 @@ from chat_agh.utils.agents_info import (
     AgentsInfo,
 )
 from chat_agh.utils.chat_history import ChatHistory
+from chat_agh.utils.utils import logger
 
 
 class ChatGraph:
