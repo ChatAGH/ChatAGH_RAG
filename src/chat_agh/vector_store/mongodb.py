@@ -67,43 +67,37 @@ class MongoDBVectorStore:
             existing = []
 
         if self.search_index_name not in existing:
-            try:
-                if isinstance(self.text_field, list):
-                    fields_mapping = {f: {"type": "string"} for f in self.text_field}
-                else:
-                    fields_mapping = {self.text_field: {"type": "string"}}
-                search_index_model = {
-                    "name": self.search_index_name,
-                    "definition": {
-                        "mappings": {
-                            "dynamic": False,
-                            "fields": fields_mapping,
-                        }
-                    },
-                }
-                self.collection.create_search_index(search_index_model)
-            except Exception:
-                pass
+            if isinstance(self.text_field, list):
+                fields_mapping = {f: {"type": "string"} for f in self.text_field}
+            else:
+                fields_mapping = {self.text_field: {"type": "string"}}
+            search_index_model = {
+                "name": self.search_index_name,
+                "definition": {
+                    "mappings": {
+                        "dynamic": False,
+                        "fields": fields_mapping,
+                    }
+                },
+            }
+            self.collection.create_search_index(search_index_model)
 
         if self.vector_index_name not in existing:
-            try:
-                vector_index_model = {
-                    "name": self.vector_index_name,
-                    "type": "vectorSearch",
-                    "definition": {
-                        "fields": [
-                            {
-                                "type": "vector",
-                                "path": self.vector_field,
-                                "numDimensions": self.num_dimensions,
-                                "similarity": self.similarity,
-                            }
-                        ]
-                    },
-                }
-                self.collection.create_search_index(vector_index_model)
-            except Exception:
-                pass
+            vector_index_model = {
+                "name": self.vector_index_name,
+                "type": "vectorSearch",
+                "definition": {
+                    "fields": [
+                        {
+                            "type": "vector",
+                            "path": self.vector_field,
+                            "numDimensions": self.num_dimensions,
+                            "similarity": self.similarity,
+                        }
+                    ]
+                },
+            }
+            self.collection.create_search_index(vector_index_model)
 
     def indexing(
         self, documents: List[Document], batch_size: int = 500

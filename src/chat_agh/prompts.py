@@ -3,7 +3,7 @@ from datetime import date
 TODAY_STR = date.today().isoformat()
 
 SUPERVISOR_AGENT_PROMPT_TEMPLATE = """
-You are a supervisor agent in RAG system.
+You are a supervisor agent in the RAG system.
 Your primary goal is to chat with the user and provide accurate, reliable, and context-grounded answers.
 Your task is to analyze provided context and decide:
     - If you can reliably answer using context, your knowledge or chat history.
@@ -51,7 +51,7 @@ Instructions:
        "retrieval_decision": False,
    }}
 
-1. If the latest_user_message requires additional information and based on the conversation you know what to ask for:
+5. If the latest_user_message requires additional information and based on the conversation you know what to ask for:
    - Identify the most relevant agent(s) based on their description and previous retrieved context.
    - Formulate precise, comprehensive queries for each selected agent to retrieve the information needed. The query should contain all information required to find proper source.
    - Question should contain a lot of phrases, words related to the question. More informations in the query is more accurate retrieval.

@@ -38,30 +38,90 @@ class RetrievalAgentInfo:
 
 RETRIEVAL_AGENTS = [
     RetrievalAgentInfo(
-        name="recrutation_agent",
-        vector_store_index_name="rekrutacja",
+        name="main_agent",
+        vector_store_index_name="cluster_0",
         description="""
-        Agent wyszukujący informacji dotyczących rekrutacji na AGH na różne typy studiów.
-        Ma dostęp do regulaminów, kalendarzy, aktualnych informacji i wszystkiego co związane z rekrutacją.
+        Agent pobierający informację z głównej strony agh, na której znajdują się podstawowe informacje o uczelni i
+        przekierowania do innych domen/informacji. Zawiera również informacje z Centurm Obsługi Kształcenia
+        gdzie można znaleźć informacje dotyczące organizacji i koordynacji procesu kształcenia na studiach wyższych i podyplomowych,
+        w tym obsługi systemu USOS, zasad i procedur dydaktycznych oraz wsparcia technicznego dla jednostek uczelni.
+
+        Obsługuje domeny:
+        - agh.edu.pl
+        - cok.agh.edu.pl
         """,
     ),
     RetrievalAgentInfo(
-        name="campus_agent",
-        vector_store_index_name="miasteczko",
+        name="Wydział Humanistyczny agent",
+        vector_store_index_name="cluster_1",
         description="""
-        Agent wyszukujący informacji dotyczących kampusu AGH.
-        Ma dostęp do danych o domach studenckich (akademikach), ich przyznawaniu, obowiązujących zasad i regulaminów
-        i wszystkich informacji związanych z życiem na kampusie AGH
+        Agent Wydziału Humanistycznego AGH
+
+        Obsługuje domeny:
+        - wh.agh.edu.pl
+        - power.3.5.wh.agh.edu.pl
+        - konfpau.wh.agh.edu.pl
+        - multisite.wh.agh.edu.pl
         """,
     ),
     RetrievalAgentInfo(
-        name="dss_agent",
-        vector_store_index_name="dss",
+        name="Wydział Informatyczny agent",
+        vector_store_index_name="cluster_2",
         description="""
-        Agent wyszukujący informacji z działu spraw studenckich AGH.
-        Informacje o procedurach administracyjnych, takich jak składanie wniosków o stypendia,
-         urlopy dziekańskie czy wydawanie zaświadczeń.
-          Dodatkowo często dostępne są wzory dokumentów, regulaminy studiów i informacje dotyczące akademików, pomocy materialnej czy szeroko pojętej działąlności uczelni.
+        Agent Wydziału Informatyki AGH
+
+        Obsługuje domeny:
+        - informatyka.agh.edu.pl
+        """,
+    ),
+    RetrievalAgentInfo(
+        name="Podyplomoce agent",
+        vector_store_index_name="cluster_3",
+        description="""
+        Agent zajmujący sie studiami podyplomowymi agh oraz studenckimi kołami naukowymi na agh.
+
+        Obsługuje domeny:
+        - informatyka.podyplomowe.agh.edu.pl
+        - podyplomowe.agh.edu.pl
+        - skn.agh.edu.pl
+        """,
+    ),
+    RetrievalAgentInfo(
+        name="Wydział Inżynierii Lądowej i Gospodarki Zasobami agent",
+        vector_store_index_name="cluster_4",
+        description="""
+        Agent Wydział Inżynierii Lądowej i Gospodarki Zasobami
+
+        Obsługuje domeny:
+        - wilgz.agh.edu.pl
+        """,
+    ),
+    RetrievalAgentInfo(
+        name="Oferta badawcza agh agent",
+        vector_store_index_name="cluster_5",
+        description="""
+        Infmroacje o ofercie badawczej agh, bazie aparatury, zespołach badawczych itd.
+
+        Obsługuje domeny:
+        - oferta-badawcza.agh.edu.pl
+        """,
+    ),
+    RetrievalAgentInfo(
+        name="SKOS AGH",
+        vector_store_index_name="cluster_6",
+        description="""
+        System Informacyjny AGH, informacje o pracownikach, ciałach kolegialnych i jednostkach organizacyjnych.
+
+        Obsługuje domeny:
+        - skos.agh.edu.pl
+        - old.skos.agh.edu.pl
+        """,
+    ),
+    RetrievalAgentInfo(
+        name="Sprawy studenckie",
+        vector_store_index_name="cluster_7",
+        description="""
+
         """,
     ),
 ]
