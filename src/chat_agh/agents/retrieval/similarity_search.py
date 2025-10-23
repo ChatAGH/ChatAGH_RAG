@@ -22,17 +22,17 @@ class SimilaritySearch:
         self.num_retrieved_chunks = num_retrieved_chunks
         self.window_size = window_size
         self.vector_store = MongoDBVectorStore(index_name)
-        self.chunks_collection: Collection[Dict[str, Any]] = mongo_client[
-            MONGO_DATABASE_NAME
-        ]["chunks"]
+        self.collection: Collection[Dict[str, Any]] = mongo_client[MONGO_DATABASE_NAME][
+            index_name
+        ]
 
     @log_execution_time
     def __call__(self, state: RetrievalState) -> Dict[str, Dict[str, list[Document]]]:
         retrieved_chunks = self.vector_store.search(
             state["query"], k=self.num_retrieved_chunks
         )
-        aggregated_docs = aggregate_by_url(retrieved_chunks)
 
+        aggregated_docs = aggregate_by_url(retrieved_chunks)
         logger.info(
             "Retrieved {} documents, source urls: {}".format(
                 len(retrieved_chunks), aggregated_docs.keys()
@@ -52,14 +52,16 @@ class SimilaritySearch:
             seq_numbers: set[int] = set()
             for doc in docs:
                 seq = doc.metadata["sequence_number"]
-                window_range = range(seq - self.window_size, seq + self.window_size + 1)
+                window_range = range(
+                    max(seq - self.window_size, 0), seq + self.window_size + 1
+                )
                 seq_numbers.update(window_range)
 
             query = {
                 "metadata.url": url,
                 "metadata.sequence_number": {"$in": list(seq_numbers)},
             }
-            results: Iterable[Dict[str, Any]] = self.chunks_collection.find(query)
+            results: Iterable[Dict[str, Any]] = self.collection.find(query)
 
             seen: set[Tuple[str, int]] = set()
             unique_docs_raw: list[Dict[str, Any]] = []
@@ -73,6 +75,7 @@ class SimilaritySearch:
                 Document(page_content=d["text"], metadata=d["metadata"])
                 for d in unique_docs_raw
             ]
+
             return url, sorted(unique_docs, key=lambda d: d.metadata["sequence_number"])
 
         with ThreadPoolExecutor() as executor:
