@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Union, cast
 from langchain_core.documents import Document
 from pymongo.results import InsertManyResult
 
-from chat_agh.utils.utils import embedding_model, logger, mongo_client
+from chat_agh.utils import embedding_model, logger, mongo_client
 
 
 class MongoDBVectorStore:

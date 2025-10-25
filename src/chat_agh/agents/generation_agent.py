@@ -1,5 +1,3 @@
-import json
-import os
 from collections.abc import Generator
 from typing import Any, Dict
 
@@ -8,6 +6,7 @@ from langchain_core.runnables import Runnable
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from chat_agh.prompts import GENERATION_PROMPT_TEMPLATE
+from chat_agh.utils.utils import GEMINI_API_KEY
 
 DEFAULT_GENERATION_MODEL = "gemini-2.5-flash"
 
@@ -15,9 +14,8 @@ DEFAULT_GENERATION_MODEL = "gemini-2.5-flash"
 class GenerationAgent:
     def __init__(self) -> None:
         super().__init__()
-        self.api_keys = json.loads(os.getenv("GEMINI_API_KEYS", "[]"))
         self.llm = ChatGoogleGenerativeAI(
-            model=DEFAULT_GENERATION_MODEL, api_key=self.api_keys[0]
+            model=DEFAULT_GENERATION_MODEL, api_key=GEMINI_API_KEY
         )
 
         self.prompt = PromptTemplate(

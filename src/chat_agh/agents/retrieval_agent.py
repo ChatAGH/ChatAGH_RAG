@@ -43,6 +43,11 @@ class RetrievalAgent:
         )
 
     def query(self, query: str) -> str:
-        initial_state = RetrievalState(query=query)
+        initial_state = RetrievalState(query=query, retrieved_context=[])
         result = self.graph.invoke(initial_state)
-        return result.get("summary").content  # type: ignore[no-any-return]
+        summary_node = result.get("summary")
+        summary = getattr(summary_node, "content")
+
+        if not isinstance(summary, str):
+            raise TypeError("RetrievalAgent expected summary to be a string")
+        return summary
