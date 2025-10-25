@@ -86,7 +86,9 @@ class ChatGraph:
 if __name__ == "__main__":
     chat_graph = ChatGraph()
 
-    chat_history = ChatHistory(messages=[HumanMessage("Jak zostać studentem AGH?")])
+    chat_history = ChatHistory(
+        messages=[HumanMessage("Jak uzyskać miejsce w akademiku?")]
+    )
     logger.info("START")
     for c in chat_graph.stream(chat_history):
         print(c)
