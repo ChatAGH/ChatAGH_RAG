@@ -4,7 +4,8 @@ version = "0.1.0"
 description = "RAG Chatbot for AGH University of Cracow"
 readme = "README.md"
 authors = [
-  { name="Witold Nowogórski", email="nowogorskiwitold@gmail.com" }
+  { name="Witold Nowogórski", email="nowogorskiwitold@gmail.com" },
+  { name="Michał Dyrek", email="lahcim.md@gmail.com" }
 ]
 [tool.poetry]
 package-mode = false

@@ -3,7 +3,7 @@ from datetime import date
 TODAY_STR = date.today().isoformat()
 
 SUPERVISOR_AGENT_PROMPT_TEMPLATE = """
-You are a supervisor agent in RAG system.
+You are a supervisor agent in the RAG system.
 Your primary goal is to chat with the user and provide accurate, reliable, and context-grounded answers.
 Your task is to analyze provided context and decide:
     - If you can reliably answer using context, your knowledge or chat history.
