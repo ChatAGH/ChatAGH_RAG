@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_huggingface import HuggingFaceEmbeddings
 from opik import Opik, evaluate
@@ -36,7 +38,7 @@ class ExperimentRunner:
         self.ragas_evaluator_model_name = ragas_evaluator_model_name
         self.evaluator_embeddings_model_name = evaluator_embeddings_model_name
 
-    def configure_scoring_metrics(self) -> list[BaseMetricWrapper]:
+    def configure_scoring_metrics(self) -> Sequence[BaseMetricWrapper]:
         emb = LangchainEmbeddingsWrapper(
             HuggingFaceEmbeddings(model_name="intfloat/multilingual-e5-large")
         )

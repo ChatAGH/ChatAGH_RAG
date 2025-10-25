@@ -13,7 +13,7 @@ from chat_agh.prompts import (
     SUMMARY_GENERATION_PROMPT_TEMPLATE,
     SUPERVISOR_AGENT_PROMPT_TEMPLATE,
 )
-from chat_agh.utils.utils import logger
+from chat_agh.utils import logger
 from scripts.consts import (
     DATASET_NAME,
     EMBEDDINGS_MODEL,

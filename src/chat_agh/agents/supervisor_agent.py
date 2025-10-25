@@ -9,11 +9,14 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, model_validator
 
 from chat_agh.prompts import SUPERVISOR_AGENT_PROMPT_TEMPLATE
-from chat_agh.utils.agents_info import RETRIEVAL_AGENTS, AgentDetails, AgentsInfo
-from chat_agh.utils.chat_history import ChatHistory
-from chat_agh.utils.utils import GEMINI_API_KEY
-
-DEFAULT_SUPERVISOR_MODEL = "gemini-2.5-flash"
+from chat_agh.utils import (
+    DEFAULT_SUPERVISOR_MODEL,
+    GEMINI_API_KEY,
+    RETRIEVAL_AGENTS,
+    AgentDetails,
+    AgentsInfo,
+    ChatHistory,
+)
 
 
 class SupervisorOutput(BaseModel):
