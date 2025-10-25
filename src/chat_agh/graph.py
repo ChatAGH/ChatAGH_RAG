@@ -11,18 +11,18 @@ from chat_agh.nodes import (
     SupervisorNode,
 )
 from chat_agh.states import ChatState
+from chat_agh.utils import logger
 from chat_agh.utils.agents_info import (
     RETRIEVAL_AGENTS,
     AgentDetails,
     AgentsInfo,
 )
 from chat_agh.utils.chat_history import ChatHistory
-from chat_agh.utils.utils import logger
 
 
 class ChatGraph:
     def __init__(self) -> None:
-        self.graph: Any = (
+        self.graph = (
             StateGraph(ChatState)
             .add_node(
                 "initial_retrieval_node",
@@ -51,10 +51,7 @@ class ChatGraph:
         return self.invoke(chat_history)
 
     def invoke(self, chat_history: ChatHistory) -> str:
-        state = ChatState(
-            chat_history=chat_history, agents_info=self._get_agents_info()
-        )
-        result = cast(dict[str, Any], self.graph.invoke(state))
+        result = self.invoke_with_details(chat_history)
         response = result.get("response")
         if not isinstance(response, str):
             raise TypeError("ChatGraph expected response to be a string")
@@ -69,6 +66,13 @@ class ChatGraph:
             if not isinstance(content, str):
                 raise TypeError("ChatGraph stream yielded chunk without string content")
             yield content
+
+    def invoke_with_details(self, chat_history: ChatHistory) -> dict[str, Any]:
+        state = ChatState(
+            chat_history=chat_history, agents_info=self._get_agents_info()
+        )
+        result = cast(dict[str, Any], self.graph.invoke(state))
+        return result
 
     def _get_agents_info(self) -> AgentsInfo:
         return AgentsInfo(

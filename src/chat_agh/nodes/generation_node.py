@@ -1,10 +1,10 @@
 from typing import Dict, List
 
-from langgraph.config import get_stream_writer
 from langchain_core.documents import Document
+from langgraph.config import get_stream_writer
 
-from chat_agh.states import ChatState
 from chat_agh.agents import GenerationAgent
+from chat_agh.states import ChatState
 from chat_agh.utils.utils import log_execution_time, retry_on_exception
 
 
@@ -14,14 +14,13 @@ class GenerationNode:
 
     @retry_on_exception(attempts=2, delay=1, backoff=3)
     @log_execution_time
-    def __call__(self, state: ChatState) -> Dict[str, str]:
+    def __call__(self, state: ChatState) -> Dict[str, str | list[str]]:
         writer = get_stream_writer()
 
+        documents: List[Document] = state.get("context", [])
         if any(agent.cached_history for agent in state["agents_info"].agents_details):
             context = str(state["agents_info"])
-            context = str(state["agents_info"])
         else:
-            documents: List[Document] = state["context"]
             context = "\n".join([document.page_content for document in documents])
 
         args = {"context": context, "chat_history": state["chat_history"]}
@@ -33,4 +32,9 @@ class GenerationNode:
                 raise TypeError("GenerationAgent returned chunk without string content")
             response += content
 
-        return {"response": response}
+        retrieved_contexts = [document.page_content for document in documents]
+
+        return {
+            "response": response,
+            "retrieved_contexts": retrieved_contexts,
+        }

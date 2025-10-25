@@ -1,0 +1,6 @@
+- question: Who is the dean of AGH UST?
+  answer: The dean of AGH UST is Jerzy Lis.
+  criteria:
+  - Information that Jerzy Lis is the dean.
+  sources: "https://agh.edu.pl"
+  comment: Text

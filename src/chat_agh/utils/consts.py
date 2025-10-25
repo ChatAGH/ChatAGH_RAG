@@ -1,0 +1,1 @@
+MONGO_DATABASE_NAME = "chat_agh"

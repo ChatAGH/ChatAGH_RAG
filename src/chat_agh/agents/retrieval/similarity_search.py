@@ -6,12 +6,7 @@ from pymongo.collection import Collection
 
 from chat_agh.agents.retrieval.utils import aggregate_by_url
 from chat_agh.states import RetrievalState
-from chat_agh.utils.utils import (
-    MONGO_DATABASE_NAME,
-    log_execution_time,
-    logger,
-    mongo_client,
-)
+from chat_agh.utils import MONGO_DATABASE_NAME, log_execution_time, logger, mongo_client
 from chat_agh.vector_store.mongodb import MongoDBVectorStore
 
 

@@ -8,7 +8,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from chat_agh.agents.retrieval.utils import aggregate_by_url
 from chat_agh.states import RetrievalState
-from chat_agh.utils.utils import (
+from chat_agh.utils import (
     MONGO_DATABASE_NAME,
     RetrievedContext,
     embedding_model,

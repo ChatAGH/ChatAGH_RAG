@@ -1,8 +1,6 @@
-import json
-import os
 from typing import Any, Dict, List, Optional, Union
 
-from langchain.schema import BaseMessage
+from langchain.schema import AIMessage, BaseMessage, HumanMessage
 from langchain_core.documents import Document
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
@@ -13,6 +11,7 @@ from pydantic import BaseModel, model_validator
 from chat_agh.prompts import SUPERVISOR_AGENT_PROMPT_TEMPLATE
 from chat_agh.utils.agents_info import RETRIEVAL_AGENTS, AgentDetails, AgentsInfo
 from chat_agh.utils.chat_history import ChatHistory
+from chat_agh.utils.utils import GEMINI_API_KEY
 
 DEFAULT_SUPERVISOR_MODEL = "gemini-2.5-flash"
 
@@ -49,9 +48,8 @@ class SupervisorOutput(BaseModel):
 class SupervisorAgent:
     def __init__(self) -> None:
         super().__init__()
-        self.api_keys = json.loads(os.getenv("GEMINI_API_KEYS", "[]"))
         self.llm = ChatGoogleGenerativeAI(
-            model=DEFAULT_SUPERVISOR_MODEL, api_key=self.api_keys[0]
+            model=DEFAULT_SUPERVISOR_MODEL, api_key=GEMINI_API_KEY
         )
 
         self.output_parser = PydanticOutputParser(pydantic_object=SupervisorOutput)
@@ -80,15 +78,6 @@ class SupervisorAgent:
 
 
 if __name__ == "__main__":
-    from dotenv import load_dotenv
-
-    load_dotenv("/.env")
-
-    from langchain.schema import AIMessage, HumanMessage
-
-    from chat_agh.utils.chat_history import ChatHistory
-    from chat_agh.utils.chat_history import ChatHistory
-
     agent = SupervisorAgent()
     res = agent.invoke(
         agents_info=AgentsInfo(
