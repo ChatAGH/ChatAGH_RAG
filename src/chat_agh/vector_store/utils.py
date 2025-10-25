@@ -1,7 +1,13 @@
 from typing import Sequence, cast
 
-from nltk.tokenize import word_tokenize
 from rank_bm25 import BM25Okapi
+
+import nltk
+
+try:
+    nltk.data.find("tokenizers/punkt_tab")
+except LookupError:
+    nltk.download("punkt_tab")
 
 
 def bm25_similarity(text1: str, text2: str) -> float:
@@ -15,8 +21,8 @@ def bm25_similarity(text1: str, text2: str) -> float:
     Returns:
         float: BM25 similarity score.
     """
-    doc_tokens = word_tokenize(text1.lower())
-    query_tokens = word_tokenize(text2.lower())
+    doc_tokens = nltk.word_tokenize(text1.lower())
+    query_tokens = nltk.word_tokenize(text2.lower())
 
     bm25 = BM25Okapi([doc_tokens])
     scores = cast(Sequence[float], bm25.get_scores(query_tokens))

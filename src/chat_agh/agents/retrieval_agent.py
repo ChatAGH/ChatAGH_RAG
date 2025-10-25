@@ -32,7 +32,8 @@ class RetrievalAgent:
                 ),
             )
             .add_node(
-                "context_retrieval", ContextRetrieval(num_chunks=num_context_chunks)
+                "context_retrieval",
+                ContextRetrieval(index_name=index_name, num_chunks=num_context_chunks),
             )
             .add_node("summary_generation", SummaryGeneration())
             .add_edge("similarity_search", "context_retrieval")
