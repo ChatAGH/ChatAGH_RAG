@@ -29,9 +29,15 @@ class ContextRetrieval:
             MONGO_DATABASE_NAME
         ]["chunks"]
 
+    def _get_retrieved_chunks(self, state: RetrievalState) -> Dict[str, List[Document]]:
+        if not (retrieved_chunks := state.get("retrieved_chunks")):
+            raise KeyError("RetrievalState is missing 'retrieved_chunks")
+
+        return retrieved_chunks
+
     @log_execution_time
     def __call__(self, state: RetrievalState) -> Dict[str, List[RetrievedContext]]:
-        retrieved_chunks: Dict[str, List[Document]] = state["retrieved_chunks"]
+        retrieved_chunks = self._get_retrieved_chunks(state)
         contexts: List[RetrievedContext] = []
 
         def process(url: str, chunks: List[Document]) -> RetrievedContext:

@@ -5,7 +5,7 @@ from opik.evaluation.metrics.score_result import ScoreResult
 from ragas.metrics import AnswerRelevancy
 
 from scripts.consts import PROJECT_NAME
-from scripts.metrics import BaseMetricWrapper
+from scripts.metrics.base_metric import BaseMetricWrapper
 
 
 class AnswerRelevancyWrapper(BaseMetricWrapper):
