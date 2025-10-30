@@ -86,9 +86,17 @@ class ChatGraph:
 if __name__ == "__main__":
     chat_graph = ChatGraph()
 
-    chat_history = ChatHistory(
-        messages=[HumanMessage("Jak uzyskać miejsce w akademiku?")]
-    )
+    chat_history = ChatHistory(messages=[HumanMessage("Jak zostać studentem AGH?")])
     logger.info("START")
-    for c in chat_graph.stream(chat_history):
-        print(c)
+
+    res = chat_graph.invoke(chat_history)
+    print(res)
+
+    # for c in chat_graph.stream(chat_history):
+    #     print(c)
+
+    logger.info("END")
+
+    from chat_agh.utils.model_inference import GoogleGenAIModelInference
+
+    print(GoogleGenAIModelInference().get_usage())
