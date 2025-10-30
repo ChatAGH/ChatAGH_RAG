@@ -26,7 +26,10 @@ class ChatGraph:
             StateGraph(ChatState)
             .add_node(
                 "initial_retrieval_node",
-                InitialRetrievalNode(["cluster_0"]),
+                InitialRetrievalNode(
+                    collections=["cluster_0"],
+                    num_chunks=3,
+                ),
             )
             .add_node("supervisor_node", SupervisorNode())
             .add_node("retrieval_node", RetrievalNode())
@@ -50,11 +53,13 @@ class ChatGraph:
         chat_history = ChatHistory(messages=[HumanMessage(question)])
         return self.invoke(chat_history)
 
-    def invoke(self, chat_history: ChatHistory) -> str:
+    def invoke(
+        self, chat_history: ChatHistory, config: dict[Any, Any] | None = None
+    ) -> str:
         state = ChatState(
             chat_history=chat_history, agents_info=self._get_agents_info()
         )
-        result = cast(dict[str, Any], self.graph.invoke(state))
+        result = cast(dict[str, Any], self.graph.invoke(state, config=config))
         response = result.get("response")
         if not isinstance(response, str):
             raise TypeError("ChatGraph expected response to be a string")
@@ -89,11 +94,11 @@ if __name__ == "__main__":
     chat_history = ChatHistory(messages=[HumanMessage("Jak zostać studentem AGH?")])
     logger.info("START")
 
-    res = chat_graph.invoke(chat_history)
-    print(res)
+    # res = chat_graph.invoke(chat_history, config={"configurable": {"generation_exec_mode": "invoke"}})
+    # print(res)
 
-    # for c in chat_graph.stream(chat_history):
-    #     print(c)
+    for c in chat_graph.stream(chat_history):
+        print(c)
 
     logger.info("END")
 

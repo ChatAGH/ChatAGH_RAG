@@ -1,6 +1,8 @@
-from typing import Dict, List, Any, Iterator
-from langgraph.config import get_stream_writer
+from typing import Dict, List, Any, Iterator, Optional
 from langchain_core.documents import Document
+from langchain_core.runnables import RunnableConfig
+from langgraph.types import StreamWriter  # <-- inject this
+from langgraph.config import get_stream_writer
 
 from chat_agh.states import ChatState
 from chat_agh.agents import GenerationAgent
@@ -8,7 +10,6 @@ from chat_agh.utils.utils import log_execution_time, retry_on_exception
 
 
 def _extract_text(payload: Any) -> Any:
-    """Extract string content from common payload shapes."""
     if isinstance(payload, str):
         return payload
     if isinstance(payload, dict) and isinstance(payload.get("content"), str):
@@ -20,11 +21,10 @@ def _extract_text(payload: Any) -> Any:
 
 
 def _build_context(state: ChatState) -> str:
-    """Prefer cached history; otherwise join retrieved documents."""
     if any(agent.cached_history for agent in state["agents_info"].agents_details):
         return str(state["agents_info"])
-    documents: List[Document] = state["context"]
-    return "\n".join(doc.page_content for doc in documents)
+    docs: List[Document] = state["context"]
+    return "\n".join(d.page_content for d in docs)
 
 
 class GenerationNode:
@@ -43,11 +43,24 @@ class GenerationNode:
 
     @retry_on_exception(attempts=2, delay=1, backoff=3)
     @log_execution_time
-    def __call__(self, state: ChatState) -> Dict[str, str]:
-        writer = get_stream_writer()
+    def __call__(
+        self,
+        state: ChatState,
+        *,
+        writer: Optional[StreamWriter] = None,
+        config: RunnableConfig,
+    ) -> Dict[str, str]:
         args = {"context": _build_context(state), "chat_history": state["chat_history"]}
 
-        if writer is not None and hasattr(self.agent, "stream"):
+        cfg = config.get("configurable") or {}
+        mode = cfg.get("generation_exec_mode", "stream")
+
+        if mode == "invoke":
+            result = self.agent.invoke(**args)
+            return {"response": _extract_text(result)}
+
+        if mode == "stream":
+            writer = get_stream_writer()
             final_text = ""
             for chunk in self.agent.stream(**args):
                 writer(chunk)
