@@ -20,14 +20,15 @@ from chat_agh.vector_store.utils import bm25_similarity
 
 
 class ContextRetrieval:
-    def __init__(self, num_chunks: int = 2) -> None:
+    def __init__(self, index_name: str, num_chunks: int = 2) -> None:
+        self.index_name = index_name
         self.num_chunks = num_chunks
         self.graph_edges_collection: Collection[Dict[str, Any]] = mongo_client[
             MONGO_DATABASE_NAME
-        ]["edges"]
+        ]["graph"]
         self.chunks_collection: Collection[Dict[str, Any]] = mongo_client[
             MONGO_DATABASE_NAME
-        ]["chunks"]
+        ][index_name]
 
     def _get_retrieved_chunks(self, state: RetrievalState) -> Dict[str, List[Document]]:
         if not (retrieved_chunks := state.get("retrieved_chunks")):

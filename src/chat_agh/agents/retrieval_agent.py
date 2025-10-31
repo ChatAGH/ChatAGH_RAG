@@ -32,7 +32,8 @@ class RetrievalAgent:
                 ),
             )
             .add_node(
-                "context_retrieval", ContextRetrieval(num_chunks=num_context_chunks)
+                "context_retrieval",
+                ContextRetrieval(index_name=index_name, num_chunks=num_context_chunks),
             )
             .add_node("summary_generation", SummaryGeneration())
             .add_edge("similarity_search", "context_retrieval")
@@ -44,9 +45,4 @@ class RetrievalAgent:
     def query(self, query: str) -> str:
         initial_state = RetrievalState(query=query, retrieved_context=[])
         result = self.graph.invoke(initial_state)
-        summary_node = result.get("summary")
-        summary = getattr(summary_node, "content")
-
-        if not isinstance(summary, str):
-            raise TypeError("RetrievalAgent expected summary to be a string")
-        return summary
+        return result.get("summary").content  # type: ignore[no-any-return]
