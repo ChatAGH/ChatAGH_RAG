@@ -27,8 +27,9 @@ class ChatGraph:
             .add_node(
                 "initial_retrieval_node",
                 InitialRetrievalNode(
-                    collections=["cluster_0"],
-                    num_chunks=3,
+                    collections=["cluster_0", "cluster_8", "cluster_7"],
+                    num_chunks=5,
+                    k=8,
                 ),
             )
             .add_node("supervisor_node", SupervisorNode())
@@ -91,14 +92,18 @@ class ChatGraph:
 if __name__ == "__main__":
     chat_graph = ChatGraph()
 
-    chat_history = ChatHistory(messages=[HumanMessage("Jak zostać studentem AGH?")])
+    chat_history = ChatHistory(
+        messages=[HumanMessage("Kiedy zaczyna sie rekrutcja na AGH?")]
+    )
     logger.info("START")
 
-    # res = chat_graph.invoke(chat_history, config={"configurable": {"generation_exec_mode": "invoke"}})
-    # print(res)
+    res = chat_graph.invoke(
+        chat_history, config={"configurable": {"generation_exec_mode": "invoke"}}
+    )
+    print(res)
 
-    for c in chat_graph.stream(chat_history):
-        print(c)
+    # for c in chat_graph.stream(chat_history):
+    #     print(c)
 
     logger.info("END")
 
