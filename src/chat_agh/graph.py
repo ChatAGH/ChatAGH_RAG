@@ -26,7 +26,11 @@ class ChatGraph:
             StateGraph(ChatState)
             .add_node(
                 "initial_retrieval_node",
-                InitialRetrievalNode(["cluster_0"]),
+                InitialRetrievalNode(
+                    collections=["cluster_0", "cluster_8", "cluster_7"],
+                    num_chunks=5,
+                    k=8,
+                ),
             )
             .add_node("supervisor_node", SupervisorNode())
             .add_node("retrieval_node", RetrievalNode())
@@ -50,11 +54,13 @@ class ChatGraph:
         chat_history = ChatHistory(messages=[HumanMessage(question)])
         return self.invoke(chat_history)
 
-    def invoke(self, chat_history: ChatHistory) -> str:
+    def invoke(
+        self, chat_history: ChatHistory, config: dict[Any, Any] | None = None
+    ) -> str:
         state = ChatState(
             chat_history=chat_history, agents_info=self._get_agents_info()
         )
-        result = cast(dict[str, Any], self.graph.invoke(state))
+        result = cast(dict[str, Any], self.graph.invoke(state, config=config))
         response = result.get("response")
         if not isinstance(response, str):
             raise TypeError("ChatGraph expected response to be a string")
@@ -87,8 +93,20 @@ if __name__ == "__main__":
     chat_graph = ChatGraph()
 
     chat_history = ChatHistory(
-        messages=[HumanMessage("Jak uzyskać miejsce w akademiku?")]
+        messages=[HumanMessage("Kiedy zaczyna sie rekrutcja na AGH?")]
     )
     logger.info("START")
-    for c in chat_graph.stream(chat_history):
-        print(c)
+
+    res = chat_graph.invoke(
+        chat_history, config={"configurable": {"generation_exec_mode": "invoke"}}
+    )
+    print(res)
+
+    # for c in chat_graph.stream(chat_history):
+    #     print(c)
+
+    logger.info("END")
+
+    from chat_agh.utils.model_inference import GoogleGenAIModelInference
+
+    print(GoogleGenAIModelInference().get_usage())
