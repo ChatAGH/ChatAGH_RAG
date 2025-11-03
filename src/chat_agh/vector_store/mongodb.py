@@ -51,8 +51,8 @@ class MongoDBVectorStore:
         self.search_index_name = search_index_name
         self.similarity = similarity
 
-        if create_indexes:
-            self._ensure_search_indexes()
+        # if create_indexes:
+        #     self._ensure_search_indexes()
 
     def _ensure_search_indexes(self) -> None:
         """
