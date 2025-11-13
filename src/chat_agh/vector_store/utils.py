@@ -7,7 +7,10 @@ import nltk
 try:
     nltk.data.find("tokenizers/punkt_tab")
 except LookupError:
-    nltk.download("punkt_tab")
+    raise RuntimeError(
+        "NLTK resource 'punkt_tab' not found. Please install it at build time "
+        "or mount NLTK_DATA into the container."
+    )
 
 
 def bm25_similarity(text1: str, text2: str) -> float:
