@@ -1,7 +1,7 @@
 from typing import Dict, List, Any, Iterator, Optional
 from langchain_core.documents import Document
 from langchain_core.runnables import RunnableConfig
-from langgraph.types import StreamWriter  # <-- inject this
+from langgraph.types import StreamWriter
 from langgraph.config import get_stream_writer
 
 from chat_agh.states import ChatState
@@ -56,10 +56,10 @@ class GenerationNode:
         mode = cfg.get("generation_exec_mode", "stream")
 
         if mode == "invoke":
-            result = self.agent.invoke(**args)
-            return {"response": _extract_text(result)}
+            final_text = self.agent.invoke(**args)
+            return {"response": _extract_text(final_text)}
 
-        if mode == "stream":
+        elif mode == "stream":
             writer = get_stream_writer()
             final_text = ""
             for chunk in self.agent.stream(**args):
@@ -67,5 +67,5 @@ class GenerationNode:
                 final_text += _extract_text(chunk)
             return {"response": final_text}
 
-        result = self.agent.invoke(**args)
-        return {"response": _extract_text(result)}
+        else:
+            raise ValueError(f"Unknown generation_exec_mode '{mode}'")

@@ -27,9 +27,15 @@ class ChatGraph:
             .add_node(
                 "initial_retrieval_node",
                 InitialRetrievalNode(
-                    collections=["cluster_0", "cluster_8", "cluster_7"],
-                    num_chunks=5,
-                    k=8,
+                    collections=[
+                        "cluster_0",
+                        "cluster_6",
+                        "cluster_7",
+                        "cluster_8",
+                        "cluster_9",
+                    ],
+                    num_chunks=10,
+                    k=5,
                 ),
             )
             .add_node("supervisor_node", SupervisorNode())
@@ -40,9 +46,7 @@ class ChatGraph:
             .add_conditional_edges(
                 "supervisor_node",
                 lambda state: (
-                    "retrieval_node"
-                    if state["retrieval_decision"]
-                    else "generation_node"
+                    "retrieval_node" if state["retrieval_decision"] else END
                 ),
             )
             .add_edge("retrieval_node", "generation_node")

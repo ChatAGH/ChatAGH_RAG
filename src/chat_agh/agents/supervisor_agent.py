@@ -1,5 +1,6 @@
 import json
 import os
+from collections.abc import Generator
 from typing import Any, Dict, List, Optional, Union
 
 from langchain_core.messages import BaseMessage
@@ -17,19 +18,30 @@ from chat_agh.utils.model_inference import GoogleGenAIModelInference
 
 class SupervisorOutput(BaseModel):
     retrieval_decision: bool
+    response: str | None = None
     queries: Optional[dict[str, str]] = None
 
     @model_validator(mode="before")
     def check_fields_based_on_decision(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         decision = values.get("retrieval_decision")
         queries = values.get("queries")
+        response = values.get("response")
 
         if decision:
             if not queries:
                 raise ValueError(
                     "When retrieval_decision is True, 'queries' must be provided"
                 )
+            if response:
+                raise ValueError(
+                    "When retrieval_decision is True, 'answer' should not be provided"
+                )
         else:
+            if not response:
+                raise ValueError(
+                    "When retrieval_decision is False, 'answer' must be provided"
+                )
+
             if queries is not None:
                 raise ValueError(
                     "'queries' should not be provided when retrieval_decision is False"
@@ -73,6 +85,18 @@ class SupervisorAgent:
                 "latest_user_message": chat_history[-1].content,
             }
         )
+
+    def stream(
+        self, agents_info: AgentsInfo, chat_history: Any, context: Any
+    ) -> Generator[Any, None, None]:
+        start_state: Dict[str, Any] = {
+            "context": context,
+            "agents_info": agents_info,
+            "chat_history": chat_history[:-1],
+            "latest_user_message": chat_history[-1].content,
+        }
+        for chunk in self.chain.stream(start_state):
+            yield chunk
 
 
 if __name__ == "__main__":
