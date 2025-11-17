@@ -8,6 +8,7 @@ from chat_agh.utils.utils import RetrievedContext
 
 
 class ChatState(TypedDict, total=False):
+    num_search_tries: int
     context: list[Document]
     chat_history: ChatHistory
     agents_info: AgentsInfo

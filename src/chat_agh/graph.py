@@ -6,7 +6,6 @@ from langchain_core.messages import HumanMessage
 from langgraph.graph.state import END, START, StateGraph
 
 from chat_agh.nodes import (
-    GenerationNode,
     InitialRetrievalNode,
     RetrievalNode,
     SupervisorNode,
@@ -34,13 +33,12 @@ class ChatGraph:
                         "cluster_8",
                         "cluster_9",
                     ],
-                    num_chunks=10,
+                    num_chunks=5,
                     k=5,
                 ),
             )
             .add_node("supervisor_node", SupervisorNode())
             .add_node("retrieval_node", RetrievalNode())
-            .add_node("generation_node", GenerationNode())
             .add_edge(START, "initial_retrieval_node")
             .add_edge("initial_retrieval_node", "supervisor_node")
             .add_conditional_edges(
@@ -49,8 +47,7 @@ class ChatGraph:
                     "retrieval_node" if state["retrieval_decision"] else END
                 ),
             )
-            .add_edge("retrieval_node", "generation_node")
-            .add_edge("generation_node", END)
+            .add_edge("retrieval_node", "supervisor_node")
             .compile()
         )
 
@@ -62,7 +59,9 @@ class ChatGraph:
         self, chat_history: ChatHistory, config: dict[Any, Any] | None = None
     ) -> str:
         state = ChatState(
-            chat_history=chat_history, agents_info=self._get_agents_info()
+            chat_history=chat_history,
+            agents_info=self._get_agents_info(),
+            num_search_tries=0,
         )
         result = cast(dict[str, Any], self.graph.invoke(state, config=config))
         response = result.get("response")
@@ -72,7 +71,9 @@ class ChatGraph:
 
     def stream(self, chat_history: ChatHistory) -> Generator[str, None, None]:
         state = ChatState(
-            chat_history=chat_history, agents_info=self._get_agents_info()
+            chat_history=chat_history,
+            agents_info=self._get_agents_info(),
+            num_search_tries=0,
         )
         for response_chunk in self.graph.stream(state, stream_mode="custom"):
             content = getattr(response_chunk, "content", None)
@@ -96,9 +97,7 @@ class ChatGraph:
 if __name__ == "__main__":
     chat_graph = ChatGraph()
 
-    chat_history = ChatHistory(
-        messages=[HumanMessage("Kiedy zaczyna sie rekrutcja na AGH?")]
-    )
+    chat_history = ChatHistory(messages=[HumanMessage("Kiedy jest otwarcie wydziału?")])
     logger.info("START")
 
     res = chat_graph.invoke(

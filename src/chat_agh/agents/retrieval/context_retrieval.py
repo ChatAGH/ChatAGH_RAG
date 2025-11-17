@@ -80,7 +80,7 @@ class ContextRetrieval:
                 retrieved_context_embedding=context_embedding,
                 chunks=chunks,
                 bm25_similarity_func=bm25_similarity,
-                bm25_weight=0,
+                bm25_weight=0.5,
                 top_n=self.num_chunks,
             )
             return aggregate_by_url([c["chunk"] for c in related_chunks])

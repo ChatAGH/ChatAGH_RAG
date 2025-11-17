@@ -110,3 +110,6 @@ class RetrievedContext:
             f"Related context: {related_chunks_text}"
         )
         return text
+
+    def __str__(self) -> str:
+        return self.text

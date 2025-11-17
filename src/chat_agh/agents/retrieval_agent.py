@@ -1,4 +1,7 @@
+from typing import Any
+
 from langgraph.graph.state import StateGraph
+from langgraph.graph.state import END
 
 from chat_agh.agents.retrieval import (
     ContextRetrieval,
@@ -17,6 +20,7 @@ class RetrievalAgent:
         num_retrieved_chunks: int = 5,
         num_context_chunks: int = 3,
         window_size: int = 0,
+        graph_augmentation: bool = True,
     ) -> None:
         self.name = agent_name
         self.index_name = index_name
@@ -36,13 +40,19 @@ class RetrievalAgent:
                 ContextRetrieval(index_name=index_name, num_chunks=num_context_chunks),
             )
             .add_node("summary_generation", SummaryGeneration())
-            .add_edge("similarity_search", "context_retrieval")
+            .add_edge(
+                "similarity_search", "context_retrieval" if graph_augmentation else END
+            )
             .add_edge("context_retrieval", "summary_generation")
             .set_entry_point("similarity_search")
             .compile()
         )
 
-    def query(self, query: str) -> str:
+    def query(self, query: str) -> Any:
         initial_state = RetrievalState(query=query)
         result = self.graph.invoke(initial_state)
-        return result.get("summary").content  # type: ignore[no-any-return]
+
+        if summary := result.get("summary"):
+            return summary["content"]
+        else:
+            return result.get("retrieved_context")

@@ -76,6 +76,7 @@ class SupervisorAgent:
         agents_info: AgentsInfo,
         chat_history: ChatHistory,
         context: Optional[List[Document]] = None,
+        is_retrieval_enabled: bool = True,
     ) -> SupervisorOutput:
         return self.chain.invoke(
             {
@@ -83,6 +84,7 @@ class SupervisorAgent:
                 "agents_info": agents_info,
                 "chat_history": chat_history[:-1],
                 "latest_user_message": chat_history[-1].content,
+                "retrieval": "ENABLED" if is_retrieval_enabled else "DISABLED",
             }
         )
 
