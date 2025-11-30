@@ -2,23 +2,17 @@ from typing import Any, Dict
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import Runnable
-from langchain_google_genai import ChatGoogleGenerativeAI
 
 from chat_agh.prompts import SUMMARY_GENERATION_PROMPT_TEMPLATE
 from chat_agh.states import RetrievalState
-from chat_agh.utils import (
-    RetrievedContext,
-    log_execution_time,
-    retry_on_exception,
-)
-from chat_agh.utils.utils import GEMINI_API_KEY
-
-DEFAULT_SUMMARY_GENERATION_MODEL = "gemini-2.5-flash"
+from chat_agh.utils.retrieved_context import RetrievedContext
+from chat_agh.utils.utils import log_execution_time, retry_on_exception
+from chat_agh.utils.model_inference import GoogleGenAIModelInference
 
 
 class SummaryGeneration:
-    def __init__(self, model_name: str = DEFAULT_SUMMARY_GENERATION_MODEL) -> None:
-        self.llm = ChatGoogleGenerativeAI(model=model_name, api_key=GEMINI_API_KEY)
+    def __init__(self) -> None:
+        self.llm = GoogleGenAIModelInference()
         self.prompt = PromptTemplate(
             input_variables=["context", "query"],
             template=SUMMARY_GENERATION_PROMPT_TEMPLATE,

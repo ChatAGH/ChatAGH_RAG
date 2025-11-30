@@ -1,3 +1,6 @@
+import json
+import os
+from collections.abc import Generator
 from typing import Any, Dict, List, Optional, Union
 
 from langchain.schema import AIMessage, BaseMessage, HumanMessage
@@ -5,32 +8,40 @@ from langchain_core.documents import Document
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import Runnable
-from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, model_validator
 
 from chat_agh.prompts import SUPERVISOR_AGENT_PROMPT_TEMPLATE
 from chat_agh.utils.agents_info import RETRIEVAL_AGENTS, AgentDetails, AgentsInfo
 from chat_agh.utils.chat_history import ChatHistory
-from chat_agh.utils.utils import GEMINI_API_KEY
-
-DEFAULT_SUPERVISOR_MODEL = "gemini-2.5-flash"
+from chat_agh.utils.model_inference import GoogleGenAIModelInference
 
 
 class SupervisorOutput(BaseModel):
     retrieval_decision: bool
+    response: str | None = None
     queries: Optional[dict[str, str]] = None
 
     @model_validator(mode="before")
     def check_fields_based_on_decision(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         decision = values.get("retrieval_decision")
         queries = values.get("queries")
+        response = values.get("response")
 
         if decision:
             if not queries:
                 raise ValueError(
                     "When retrieval_decision is True, 'queries' must be provided"
                 )
+            if response:
+                raise ValueError(
+                    "When retrieval_decision is True, 'answer' should not be provided"
+                )
         else:
+            if not response:
+                raise ValueError(
+                    "When retrieval_decision is False, 'answer' must be provided"
+                )
+
             if queries is not None:
                 raise ValueError(
                     "'queries' should not be provided when retrieval_decision is False"
@@ -48,9 +59,8 @@ class SupervisorOutput(BaseModel):
 class SupervisorAgent:
     def __init__(self) -> None:
         super().__init__()
-        self.llm = ChatGoogleGenerativeAI(
-            model=DEFAULT_SUPERVISOR_MODEL, api_key=GEMINI_API_KEY
-        )
+        self.api_keys = json.loads(os.getenv("GEMINI_API_KEYS", "[]"))
+        self.llm = GoogleGenAIModelInference()
 
         self.output_parser = PydanticOutputParser(pydantic_object=SupervisorOutput)
         self.prompt = PromptTemplate(
@@ -75,6 +85,18 @@ class SupervisorAgent:
                 "latest_user_message": chat_history[-1].content,
             }
         )
+
+    def stream(
+        self, agents_info: AgentsInfo, chat_history: Any, context: Any
+    ) -> Generator[Any, None, None]:
+        start_state: Dict[str, Any] = {
+            "context": context,
+            "agents_info": agents_info,
+            "chat_history": chat_history[:-1],
+            "latest_user_message": chat_history[-1].content,
+        }
+        for chunk in self.chain.stream(start_state):
+            yield chunk
 
 
 if __name__ == "__main__":
@@ -101,3 +123,5 @@ if __name__ == "__main__":
         ),
     )
     print(res)
+
+    GoogleGenAIModelInference().get_usage()

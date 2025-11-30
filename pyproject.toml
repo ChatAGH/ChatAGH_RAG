@@ -10,19 +10,19 @@ authors = [
 [tool.poetry]
 package-mode = false
 
-[tool.poetry.dependencies]
-python = "^3.11"
-langchain = { version = "^0.3.27", python = ">=3.10,<4.0" }
-langchain-huggingface = "*"
-filelock = "3.19.1"
-langchain-core = "^0.3.76"
-langgraph = "^0.6.7"
-dotenv = "^0.9.9"
-pymongo = "^4.15.0"
-sentence-transformers = "^5.1.0"
-langchain-google-genai = "^2.1.10"
-rank-bm25 = "^0.2.2"
-nltk = "^3.9.1"
+dependencies = [
+    "langchain>=0.3.27",
+    "filelock==3.19.1",
+    "langchain-core>=0.3.76",
+    "langgraph>=0.6.7",
+    "dotenv>=0.9.9",
+    "pymongo>=4.15.0",
+    "sentence-transformers>=5.1.0",
+    "langchain-google-genai>=2.1.10",
+    "rank-bm25>=0.2.2",
+    "nltk>=3.9.1",
+    "scipy>=1.14.1"
+]
 
 [tool.poetry.group.dev.dependencies]
 ragas = "*"

@@ -18,7 +18,7 @@ class RetrievalAgent:
         description: str,
         num_retrieved_chunks: int = 5,
         num_context_chunks: int = 3,
-        window_size: int = 1,
+        window_size: int = 0,
     ) -> None:
         self.name = agent_name
         self.index_name = index_name

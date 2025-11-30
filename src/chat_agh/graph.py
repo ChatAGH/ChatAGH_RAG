@@ -26,7 +26,17 @@ class ChatGraph:
             StateGraph(ChatState)
             .add_node(
                 "initial_retrieval_node",
-                InitialRetrievalNode(["cluster_0"]),
+                InitialRetrievalNode(
+                    collections=[
+                        "cluster_0",
+                        "cluster_6",
+                        "cluster_7",
+                        "cluster_8",
+                        "cluster_9",
+                    ],
+                    num_chunks=10,
+                    k=5,
+                ),
             )
             .add_node("supervisor_node", SupervisorNode())
             .add_node("retrieval_node", RetrievalNode())
@@ -36,9 +46,7 @@ class ChatGraph:
             .add_conditional_edges(
                 "supervisor_node",
                 lambda state: (
-                    "retrieval_node"
-                    if state["retrieval_decision"]
-                    else "generation_node"
+                    "retrieval_node" if state["retrieval_decision"] else END
                 ),
             )
             .add_edge("retrieval_node", "generation_node")
@@ -50,8 +58,10 @@ class ChatGraph:
         chat_history = ChatHistory(messages=[HumanMessage(question)])
         return self.invoke(chat_history)
 
-    def invoke(self, chat_history: ChatHistory) -> str:
-        result = self.invoke_with_details(chat_history)
+    def invoke(
+        self, chat_history: ChatHistory, *, config: dict[str, Any] | None = None
+    ) -> str:
+        result = self.invoke_with_details(chat_history, config=config)
         response = result.get("response")
         if not isinstance(response, str):
             raise TypeError("ChatGraph expected response to be a string")
@@ -68,12 +78,17 @@ class ChatGraph:
                 raise TypeError("ChatGraph stream yielded chunk without string content")
             yield content
 
-    def invoke_with_details(self, chat_history: ChatHistory) -> dict[str, Any]:
+    def invoke_with_details(
+        self, chat_history: ChatHistory, *, config: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         state: ChatState = {
             "chat_history": chat_history,
             "agents_info": self._get_agents_info(),
         }
-        result = cast(dict[str, Any], self.graph.invoke(cast(Any, state)))
+        invoke_config = {} if config is None else config
+        result = cast(
+            dict[str, Any], self.graph.invoke(cast(Any, state), config=invoke_config)
+        )
         return result
 
     def _get_agents_info(self) -> AgentsInfo:
@@ -93,8 +108,20 @@ if __name__ == "__main__":
     chat_graph = ChatGraph()
 
     chat_history = ChatHistory(
-        messages=[HumanMessage("Jak uzyskać miejsce w akademiku?")]
+        messages=[HumanMessage("Kiedy zaczyna sie rekrutcja na AGH?")]
     )
     logger.info("START")
-    for c in chat_graph.stream(chat_history):
-        print(c)
+
+    res = chat_graph.invoke(
+        chat_history, config={"configurable": {"generation_exec_mode": "invoke"}}
+    )
+    print(res)
+
+    # for c in chat_graph.stream(chat_history):
+    #     print(c)
+
+    logger.info("END")
+
+    from chat_agh.utils.model_inference import GoogleGenAIModelInference
+
+    print(GoogleGenAIModelInference().get_usage())
