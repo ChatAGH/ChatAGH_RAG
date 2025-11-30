@@ -10,7 +10,32 @@ from dotenv import load_dotenv
 from chat_agh.utils import logger
 
 load_dotenv()
-GEMINI_API_KEY = json.loads(os.environ["GEMINI_API_KEYS"])[0]
+
+
+def _load_api_key(list_var: str, single_var: str) -> str:
+    """Read API key from either a JSON list or a plain string env var."""
+
+    list_value = os.getenv(list_var)
+    if list_value:
+        try:
+            parsed = json.loads(list_value)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"{list_var} must be a JSON array") from exc
+        if not isinstance(parsed, list) or not parsed:
+            raise ValueError(f"{list_var} must contain at least one entry")
+        first = parsed[0]
+        if not isinstance(first, str):
+            raise ValueError(f"{list_var} entries must be strings")
+        return first
+
+    single_value = os.getenv(single_var)
+    if single_value:
+        return single_value
+
+    raise KeyError(f"Set {list_var} (JSON array) or {single_var} (string) env var")
+
+
+GEMINI_API_KEY = _load_api_key("GEMINI_API_KEYS", "GEMINI_API_KEY")
 
 P = ParamSpec("P")
 R = TypeVar("R")

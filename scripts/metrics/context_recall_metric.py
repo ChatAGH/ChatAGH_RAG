@@ -1,14 +1,14 @@
 from typing import Any
 
 from opik.evaluation.metrics.score_result import ScoreResult
-from ragas.metrics import LLMContextPrecisionWithReference
+from ragas.metrics import ContextRecall
 
 from scripts.metrics.base_metric import BaseMetricWrapper
 
 
-class ContextPrecisionWrapper(BaseMetricWrapper):
-    def __init__(self, metric: LLMContextPrecisionWithReference) -> None:
-        super().__init__(metric=metric, name="context_precision_metric")
+class ContextRecallWrapper(BaseMetricWrapper):
+    def __init__(self, metric: ContextRecall) -> None:
+        super().__init__(metric=metric, name="context_recall_metric")
 
     def score(
         self,

@@ -11,7 +11,6 @@ mongo_client: MongoClient = MongoClient(
     os.environ["MONGODB_URI"], tlsAllowInvalidCertificates=True
 )
 
-
 embedding_model: SentenceTransformer = SentenceTransformer(
     "intfloat/multilingual-e5-large"
 )

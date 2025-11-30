@@ -58,20 +58,22 @@ class ChatGraph:
         return response
 
     def stream(self, chat_history: ChatHistory) -> Generator[str, None, None]:
-        state = ChatState(
-            chat_history=chat_history, agents_info=self._get_agents_info()
-        )
-        for response_chunk in self.graph.stream(state, stream_mode="custom"):
+        state: ChatState = {
+            "chat_history": chat_history,
+            "agents_info": self._get_agents_info(),
+        }
+        for response_chunk in self.graph.stream(cast(Any, state), stream_mode="custom"):
             content = getattr(response_chunk, "content", None)
             if not isinstance(content, str):
                 raise TypeError("ChatGraph stream yielded chunk without string content")
             yield content
 
     def invoke_with_details(self, chat_history: ChatHistory) -> dict[str, Any]:
-        state = ChatState(
-            chat_history=chat_history, agents_info=self._get_agents_info()
-        )
-        result = cast(dict[str, Any], self.graph.invoke(state))
+        state: ChatState = {
+            "chat_history": chat_history,
+            "agents_info": self._get_agents_info(),
+        }
+        result = cast(dict[str, Any], self.graph.invoke(cast(Any, state)))
         return result
 
     def _get_agents_info(self) -> AgentsInfo:

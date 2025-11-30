@@ -8,11 +8,6 @@ from dotenv import load_dotenv
 from opik import Opik
 from opik.rest_api.core import ApiError
 
-from chat_agh.prompts import (
-    GENERATION_PROMPT_TEMPLATE,
-    SUMMARY_GENERATION_PROMPT_TEMPLATE,
-    SUPERVISOR_AGENT_PROMPT_TEMPLATE,
-)
 from chat_agh.utils.utils import logger
 from scripts.consts import (
     DATASET_NAME,
@@ -20,8 +15,9 @@ from scripts.consts import (
     EVALUATION_MODEL,
     PROJECT_NAME,
 )
-from scripts.evaluation_tasks.distance_metric_evaluation_task import (
-    DistanceMetricEvaluationTask,
+from scripts.evaluation_tasks.base import SearchParametersOverride
+from scripts.evaluation_tasks.vector_search_evaluation_task import (
+    VectorSearchEvaluationTask,
 )
 from scripts.experiment_runner import ExperimentRunner
 
@@ -69,6 +65,8 @@ if __name__ == "__main__":
 
     client = Opik(project_name="chat_agh_rag")
     dataset_name = _prepare_opik_dataset(client, DATASET_NAME)
+    dataset_file_path = Path(__file__).parent / "datasets" / f"{DATASET_NAME}.yaml"
+
     runner = ExperimentRunner(
         client=client,
         dataset_name=dataset_name,
@@ -76,19 +74,37 @@ if __name__ == "__main__":
         ragas_evaluator_model_name=EVALUATION_MODEL,
         criteria_evaluator_model_name=EVALUATION_MODEL,
         evaluator_embeddings_model_name=EMBEDDINGS_MODEL,
+        dataset_path=dataset_file_path,
     )
 
-    distance_metrics = ["cosine", "dot", "l2"]
+    k_limit = [5, 6, 7, 8]
+    fuzzy = True
+    fuzzy_maxedits = [1, 2]
+    fuzzy_prefix_length = [0, 1, 2]
+
+    vector_search_settings = [
+        SearchParametersOverride(),
+        SearchParametersOverride(mode="dense"),
+        SearchParametersOverride(mode="lexical"),
+        SearchParametersOverride(k=8),
+        SearchParametersOverride(num_candidates=80),
+        SearchParametersOverride(fuzzy=False),
+        SearchParametersOverride(vector_weight=1.2),
+        SearchParametersOverride(text_weight=0.8),
+        SearchParametersOverride(inner_limits={"dense": 20, "lexical": 20}),
+        SearchParametersOverride(exact=True),
+        SearchParametersOverride(dense_limit=12, lexical_limit=18),
+        SearchParametersOverride(
+            filter={"equals": {"path": "metadata.language", "value": "en"}}
+        ),
+    ]
+
     tasks = [
-        DistanceMetricEvaluationTask(
-            prompts={
-                "SUPERVISOR_AGENT_PROMPT": SUPERVISOR_AGENT_PROMPT_TEMPLATE,
-                "SUMMARY_GENERATION": SUMMARY_GENERATION_PROMPT_TEMPLATE,
-                "GENERATION_PROMPT": GENERATION_PROMPT_TEMPLATE,
-            },
-            distance_metric=metric,
+        VectorSearchEvaluationTask(
+            collection_name="cluster_0",
+            search_setting=setting,
         )
-        for metric in distance_metrics
+        for setting in vector_search_settings
     ]
 
     for task in tasks:

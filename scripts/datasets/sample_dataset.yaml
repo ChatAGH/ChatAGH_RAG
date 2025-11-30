@@ -1,6 +1,9 @@
-- question: Who is the dean of AGH UST?
-  answer: The dean of AGH UST is Jerzy Lis.
-  criteria:
-  - Information that Jerzy Lis is the dean.
-  sources: "https://agh.edu.pl"
-  comment: Text
+- question: Kto jest rektorem AGH?
+  answer: Rektorem AGH jest Jerzy Lis.
+  evaluation_criteria:
+  - Informacja, ze Jerzy Lis jest rektorem.
+
+- question: Jaka jest pelna nazwa AGH?
+  answer: Pelna nazwa AGH to Akademia Gorniczo Hutnicza w Krakowie.
+  evaluation_criteria:
+  - Informacja, ze pelna nazwa AGH to Akademia Gorniczo Hutnicza.

@@ -5,13 +5,13 @@ from ragas.dataset_schema import SingleTurnSample
 from ragas.metrics import SingleTurnMetric
 
 
-class BaseMetricWrapper(BaseMetric):  # type: ignore[misc]
+class BaseMetricWrapper(BaseMetric):
     def __init__(self, metric: SingleTurnMetric, name: str = "base_metric"):
         self.metric = metric
         self.name = name
 
-    @track(name="base_score()")  # type: ignore[misc]
-    def base_score(self, row) -> ScoreResult:  # type: ignore[no-untyped-def]
+    @track(name="base_score()")
+    def base_score(self, row) -> ScoreResult:
         row = SingleTurnSample(**row)
         score_result = self.metric.single_turn_score(row)
 

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Union, cast
+from typing import Any, Dict, List, Literal, Optional, Sequence, Union, cast
 
 from langchain_core.documents import Document
 from pymongo.results import InsertManyResult
@@ -128,29 +128,42 @@ class MongoDBVectorStore:
         return results
 
     def _dense_pipeline(
-        self, query_vector: Sequence[float], limit: int, num_candidates: int
+        self,
+        query_vector: Sequence[float],
+        limit: int,
+        num_candidates: int,
     ) -> List[Dict[str, Any]]:
-        return [
-            {
-                "$vectorSearch": {
-                    "index": self.vector_index_name,
-                    "path": self.vector_field,
-                    "queryVector": query_vector,
-                    "numCandidates": num_candidates,
-                    "limit": limit,
-                }
+        stage: Dict[str, Any] = {
+            "$vectorSearch": {
+                "index": self.vector_index_name,
+                "path": self.vector_field,
+                "queryVector": query_vector,
+                "limit": limit,
+                "numCandidates": num_candidates,
             }
-        ]
+        }
+        return [stage]
 
     def _lexical_pipeline(
-        self, query: str, limit: int, fuzzy: bool, min_should: Optional[int] = None
+        self,
+        query: str,
+        limit: int,
+        fuzzy: bool,
+        fuzzy_max_edits: int,
+        fuzzy_prefix_length: int,
     ) -> List[Dict[str, Any]]:
         text_stage: Dict[str, Any] = {
             "index": self.search_index_name,
-            "text": {"query": query, "path": self.text_field},
+            "text": {
+                "query": query,
+                "path": self.text_field,
+            },
         }
         if fuzzy:
-            text_stage["text"]["fuzzy"] = {"maxEdits": 1, "prefixLength": 2}
+            text_stage["text"]["fuzzy"] = {
+                "maxEdits": fuzzy_max_edits,
+                "prefixLength": fuzzy_prefix_length,
+            }
         pipeline: List[Dict[str, Any]] = [{"$search": text_stage}, {"$limit": limit}]
         return pipeline
 
@@ -158,54 +171,36 @@ class MongoDBVectorStore:
         self,
         query: str,
         k: int = 5,
-        mode: str = "hybrid_rrf",  # 'dense' | 'lexical' | 'hybrid_rrf'
-        num_candidates: int = 40,
-        fuzzy: bool = True,
-        vector_weight: float = 1.0,
-        text_weight: float = 1.0,
-        inner_limits: Optional[Mapping[str, int]] = None,
+        mode: Literal["dense", "lexical", "hybrid_rrf"] = "hybrid_rrf",
+        lexical_limit: Optional[int] = 10,
+        fuzzy: bool = False,
+        fuzzy_max_edits: int = 1,
+        fuzzy_prefix_length: int = 1,
+        dense_candidates: Optional[int] = 50,
+        dense_limit: Optional[int] = 10,
+        vector_weight: float = 0.5,
+        text_weight: float = 0.5,
     ) -> List[Document]:
-        """
-        Execute a search query using dense, lexical, or hybrid RRF fusion.
-        Python-based RRF is always used for hybrid.
-
-        Parameters
-        ----------
-        query : str
-            User query string.
-        k : int
-            Number of top results to return.
-        mode : str
-            'dense', 'lexical', or 'hybrid_rrf'.
-        num_candidates : int
-            Candidates to fetch for dense search before fusion.
-        fuzzy : bool
-            Enable fuzzy matching for lexical search.
-        vector_weight : float
-            Weight for dense scores in hybrid fusion.
-        text_weight : float
-            Weight for lexical scores in hybrid fusion.
-        inner_limits : dict, optional
-            Limit of results per pipeline before fusion. Example: {"dense": 25, "lexical": 25}.
-        """
-        effective_limits: Dict[str, int]
-        if inner_limits is None:
-            effective_limits = {"dense": k, "lexical": k}
-        else:
-            effective_limits = dict(inner_limits)
-
         if mode not in {"dense", "lexical", "hybrid_rrf"}:
             raise ValueError("mode must be one of: 'dense', 'lexical', 'hybrid_rrf'")
 
         results_dense: List[Dict[str, Any]] = []
         results_lexical: List[Dict[str, Any]] = []
 
+        dense_limit_value = dense_limit if dense_limit is not None else k
+        dense_candidates_value = (
+            dense_candidates if dense_candidates is not None else dense_limit_value
+        )
+        lexical_limit_value = lexical_limit if lexical_limit is not None else k
+
         if mode in {"dense", "hybrid_rrf"}:
             query_vector = self.dense_model.encode(
                 query, normalize_embeddings=(self.similarity == "cosine")
             ).tolist()
             pipeline_dense = self._dense_pipeline(
-                query_vector, effective_limits["dense"], num_candidates
+                query_vector,
+                dense_limit_value,
+                dense_candidates_value,
             ) + [
                 {
                     "$project": {
@@ -222,7 +217,11 @@ class MongoDBVectorStore:
 
         if mode in {"lexical", "hybrid_rrf"}:
             pipeline_lex = self._lexical_pipeline(
-                query, effective_limits["lexical"], fuzzy
+                query,
+                lexical_limit_value,
+                fuzzy,
+                fuzzy_max_edits,
+                fuzzy_prefix_length,
             ) + [
                 {
                     "$project": {
