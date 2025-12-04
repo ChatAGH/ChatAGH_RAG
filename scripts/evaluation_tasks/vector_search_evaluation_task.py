@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import secrets
 from typing import Any, Optional
 
 from opik import Prompt, track
 
+from chat_agh.agents import GenerationAgent
 from chat_agh.utils.utils import logger
 from chat_agh.vector_store.mongodb import MongoDBVectorStore
 from scripts.evaluation_tasks.base import CurrentSearchParameters
@@ -16,10 +16,10 @@ class VectorSearchEvaluationTask:
     def __init__(
         self,
         *,
-        collection_name: str,
+        collection_names: list[str],
         search_setting: CurrentSearchParameters,
         prompts: Optional[dict[str, str]] = None,
-        similarity: str = "cosine",
+        distance_metric: str = "cosine",
         vector_index_name: str = "vector_index",
         search_index_name: str = "default",
     ) -> None:
@@ -28,46 +28,33 @@ class VectorSearchEvaluationTask:
             Prompt(name=prompt_name, prompt=prompt_template)
             for prompt_name, prompt_template in prompts_mapping.items()
         ]
-        self._collection_name = collection_name
+        self._collection_names = collection_names
         self._search_setting = search_setting
-        self._distance_metric = "cosine"
-        self._vector_store = MongoDBVectorStore(
-            collection_name=collection_name,
-            vector_index_name=vector_index_name,
-            search_index_name=search_index_name,
-            similarity=similarity,
-            create_indexes=False,
-        )
-
-        suffix_parts = [
-            f"mode={search_setting.mode}",
-            f"k={search_setting.k}",
-            f"num_candidates={search_setting.num_candidates}",
-            f"fuzzy={'on' if search_setting.fuzzy else 'off'}",
-            f"weights={search_setting.vector_weight}-{search_setting.text_weight}",
-        ]
-        if search_setting.inner_limits:
-            limits_repr = "-".join(
-                f"{key}:{value}" for key, value in search_setting.inner_limits.items()
+        self._distance_metric = distance_metric
+        self._vector_stores = [
+            MongoDBVectorStore(
+                collection_name=collection_name,
+                vector_index_name=vector_index_name,
+                search_index_name=search_index_name,
+                similarity=distance_metric,
+                create_indexes=False,
             )
-            suffix_parts.append(f"limits={limits_repr}")
-        if search_setting.dense_limit is not None:
-            suffix_parts.append(f"dense_limit={search_setting.dense_limit}")
-        if search_setting.lexical_limit is not None:
-            suffix_parts.append(f"lexical_limit={search_setting.lexical_limit}")
+            for collection_name in self._collection_names
+        ]
+        self._generation_agent = GenerationAgent()
 
-        suffix = ",".join(suffix_parts)
-        unique_suffix = secrets.token_hex(3)
-        self.task_name = (
-            f"vector-search::{self._collection_name}::{suffix}::{unique_suffix}"
+        settings_descriptor = "_".join(
+            f"{key}-{value}" for key, value in self._search_setting.to_dict().items()
         )
+        self.task_name = settings_descriptor.replace(" ", "-")
+
         self.experiment_config = {
-            "collection": self._collection_name,
-            "similarity": similarity,
+            "collection": self._collection_names,
+            "similarity": distance_metric,
             **search_setting.to_dict(),
             "distance_metric": self._distance_metric,
         }
-        self._similarity = similarity
+        self._similarity = distance_metric
 
     @track(name="vector_search_run()")
     def run(self, input_data: dict[str, str]) -> dict[str, Any]:
@@ -76,11 +63,11 @@ class VectorSearchEvaluationTask:
             raise ValueError("Dataset entry does not contain a 'question' field")
         logger.info(
             "Executing vector search on '%s' with params %s",
-            self._collection_name,
+            self._collection_names,
             self._search_setting.to_dict(),
         )
 
-        documents = self._search_setting.run(self._vector_store, question)
+        documents = self._search_setting.run(self._vector_stores, question)
 
         serialized_context = [
             {
@@ -91,15 +78,43 @@ class VectorSearchEvaluationTask:
             for doc in documents
         ]
 
-        response_text = "\n".join(doc.page_content for doc in documents)
         retrieved_contexts = [doc.page_content for doc in documents]
+
+        response = self._generate_response(question, retrieved_contexts)
 
         return {
             "question": question,
-            "response": response_text,
+            "response": response,
             "retrieved_contexts": retrieved_contexts,
             "retrieved_context_metadata": serialized_context,
             "search_parameters": self._search_setting.to_dict(),
             "distance_metric": self._distance_metric,
             "similarity": self._similarity,
         }
+
+    def _generate_response(self, question: str, contexts: list[str]) -> str:
+        context_blob = "\n".join(contexts) if contexts else ""
+        chat_history = f"USER: {question}"
+        try:
+            raw_response = self._generation_agent.invoke(
+                context=context_blob, chat_history=chat_history
+            )
+        except Exception:
+            logger.exception(
+                "GenerationAgent failed to build response for evaluation question"
+            )
+            return context_blob
+
+        if isinstance(raw_response, str):
+            return raw_response
+        if isinstance(raw_response, dict):
+            content = raw_response.get("content")
+            if isinstance(content, str):
+                return content
+            return str(raw_response)
+
+        content_attr = getattr(raw_response, "content", None)
+        if isinstance(content_attr, str):
+            return content_attr
+
+        return str(raw_response)

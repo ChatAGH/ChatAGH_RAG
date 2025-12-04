@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Literal, Optional, Sequence, Union, cast
+from typing import Any, Dict, List, Literal, Sequence, Union, cast
 
 from langchain_core.documents import Document
 from pymongo.results import InsertManyResult
@@ -170,14 +170,14 @@ class MongoDBVectorStore:
     def search(
         self,
         query: str,
-        k: int = 5,
         mode: Literal["dense", "lexical", "hybrid_rrf"] = "hybrid_rrf",
-        lexical_limit: Optional[int] = 10,
+        lexical_limit: int = 10,
         fuzzy: bool = False,
         fuzzy_max_edits: int = 1,
         fuzzy_prefix_length: int = 1,
-        dense_candidates: Optional[int] = 50,
-        dense_limit: Optional[int] = 10,
+        dense_limit: int = 10,
+        num_dense_candidates: int = 100,
+        final_limit: int = 5,
         vector_weight: float = 0.5,
         text_weight: float = 0.5,
     ) -> List[Document]:
@@ -187,20 +187,15 @@ class MongoDBVectorStore:
         results_dense: List[Dict[str, Any]] = []
         results_lexical: List[Dict[str, Any]] = []
 
-        dense_limit_value = dense_limit if dense_limit is not None else k
-        dense_candidates_value = (
-            dense_candidates if dense_candidates is not None else dense_limit_value
-        )
-        lexical_limit_value = lexical_limit if lexical_limit is not None else k
-
         if mode in {"dense", "hybrid_rrf"}:
+            logger.info("Performing vector search")
             query_vector = self.dense_model.encode(
                 query, normalize_embeddings=(self.similarity == "cosine")
             ).tolist()
             pipeline_dense = self._dense_pipeline(
                 query_vector,
-                dense_limit_value,
-                dense_candidates_value,
+                dense_limit,
+                num_dense_candidates,
             ) + [
                 {
                     "$project": {
@@ -216,9 +211,10 @@ class MongoDBVectorStore:
             )
 
         if mode in {"lexical", "hybrid_rrf"}:
+            logger.info("Performing lexical search")
             pipeline_lex = self._lexical_pipeline(
                 query,
-                lexical_limit_value,
+                lexical_limit,
                 fuzzy,
                 fuzzy_max_edits,
                 fuzzy_prefix_length,
@@ -242,6 +238,7 @@ class MongoDBVectorStore:
         elif mode == "lexical":
             docs = results_lexical
         else:
+            logger.info("Performing reranking")
 
             def rrf_score(rank: int, k_rrf: int = 60) -> float:
                 return 1.0 / (k_rrf + rank)
@@ -259,7 +256,9 @@ class MongoDBVectorStore:
                 scores[doc_id] = scores.get(doc_id, 0) + rrf_score(idx) * text_weight
                 all_docs[doc_id] = doc
 
-            top_ids = sorted(scores, key=lambda x: scores[x], reverse=True)[:k]
+            top_ids = sorted(scores, key=lambda x: scores[x], reverse=True)[
+                :final_limit
+            ]
             docs = [all_docs[_id] for _id in top_ids]
 
         return [

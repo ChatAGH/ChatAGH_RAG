@@ -24,7 +24,7 @@ class SimilaritySearch:
     @log_execution_time
     def __call__(self, state: RetrievalState) -> Dict[str, Dict[str, list[Document]]]:
         retrieved_chunks = self.vector_store.search(
-            state["query"], k=self.num_retrieved_chunks
+            state["query"], final_limit=self.num_retrieved_chunks
         )
 
         aggregated_docs = aggregate_by_url(retrieved_chunks)

@@ -77,36 +77,46 @@ if __name__ == "__main__":
         dataset_path=dataset_file_path,
     )
 
-    k_limit = [5, 6, 7, 8]
-    fuzzy = True
-    fuzzy_maxedits = [1, 2]
-    fuzzy_prefix_length = [0, 1, 2]
+    lexical_limit_vals = [5, 10, 15]
+    fuzzy_max_edits = [1, 2]
+    fuzzy_prefix_lengths = [0, 1, 2]
 
-    vector_search_settings = [
-        SearchParametersOverride(),
-        SearchParametersOverride(mode="dense"),
-        SearchParametersOverride(mode="lexical"),
-        SearchParametersOverride(k=8),
-        SearchParametersOverride(num_candidates=80),
-        SearchParametersOverride(fuzzy=False),
-        SearchParametersOverride(vector_weight=1.2),
-        SearchParametersOverride(text_weight=0.8),
-        SearchParametersOverride(inner_limits={"dense": 20, "lexical": 20}),
-        SearchParametersOverride(exact=True),
-        SearchParametersOverride(dense_limit=12, lexical_limit=18),
-        SearchParametersOverride(
-            filter={"equals": {"path": "metadata.language", "value": "en"}}
-        ),
-    ]
+    vector_search_settings = []
+
+    for lexical_limit in lexical_limit_vals:
+        for fuzzy_max_edit in fuzzy_max_edits:
+            for fuzzy_prefix_length in fuzzy_prefix_lengths:
+                vector_search_settings.append(
+                    SearchParametersOverride(
+                        mode="lexical",
+                        lexical_limit=lexical_limit,
+                        fuzzy_max_edit=fuzzy_max_edit,
+                        fuzzy_prefix_length=fuzzy_prefix_length,
+                    )
+                )
+    vector_search_settings.extend(
+        [
+            SearchParametersOverride(
+                mode="lexical", lexical_limit=lexical_limit, fuzzy=False
+            )
+            for lexical_limit in lexical_limit_vals
+        ]
+    )
 
     tasks = [
         VectorSearchEvaluationTask(
-            collection_name="cluster_0",
+            collection_names=[
+                "cluster_0",
+                "cluster_6",
+                "cluster_7",
+                "cluster_8",
+                "cluster_9",
+            ],
             search_setting=setting,
         )
         for setting in vector_search_settings
     ]
 
     for task in tasks:
-        logger.info(f"Running experiment: {task.task_name}")
+        logger.info(f"Running experiment: {task._search_setting.to_dict()}")
         runner.run_experiment(task)

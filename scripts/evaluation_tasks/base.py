@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Literal, Mapping, Optional
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Literal
 
 from langchain_core.documents import Document
 
@@ -12,61 +13,75 @@ SearchMode = Literal["dense", "lexical", "hybrid_rrf"]
 class CurrentSearchParameters:
     """Current production parameters used as defaults for experiments."""
 
-    DEFAULT_MODE: SearchMode = "hybrid_rrf"
-    DEFAULT_K = 5
-    DEFAULT_NUM_CANDIDATES = 60
-    DEFAULT_FUZZY = True
-    DEFAULT_VECTOR_WEIGHT = 1.0
-    DEFAULT_TEXT_WEIGHT = 1.0
-
     def __init__(self) -> None:
-        self.mode: SearchMode = self.DEFAULT_MODE
-        self.k: int = self.DEFAULT_K
-        self.num_candidates: int = self.DEFAULT_NUM_CANDIDATES
-        self.fuzzy: bool = self.DEFAULT_FUZZY
-        self.vector_weight: float = self.DEFAULT_VECTOR_WEIGHT
-        self.text_weight: float = self.DEFAULT_TEXT_WEIGHT
-        self.inner_limits: Optional[dict[str, int]] = None
-        self.dense_limit: Optional[int] = None
-        self.lexical_limit: Optional[int] = None
-        self.filter: Optional[Mapping[str, Any]] = None
-        self.exact: Optional[bool] = None
+        self.mode: SearchMode = "hybrid_rrf"
+        self.final_limit: int = 5
+        self.lexical_limit: int = 10
+        self.fuzzy: bool = False
+        self.fuzzy_max_edits: int = 2
+        self.fuzzy_prefix_length: int = 0
+        self.dense_limit: int = 10
+        self.num_dense_candidates: int = 200
+        self.text_weight: float = 0.5
+        self.vector_weight: float = 0.5
 
     def to_dict(self) -> dict[str, Any]:
-        payload: dict[str, Any] = {
-            "mode": self.mode,
-            "k": self.k,
-            "num_candidates": self.num_candidates,
-            "fuzzy": self.fuzzy,
-            "vector_weight": self.vector_weight,
-            "text_weight": self.text_weight,
-        }
-        if self.inner_limits is not None:
-            payload["inner_limits"] = dict(self.inner_limits)
-        if self.dense_limit is not None:
-            payload["dense_limit"] = self.dense_limit
-        if self.lexical_limit is not None:
-            payload["lexical_limit"] = self.lexical_limit
-        if self.filter is not None:
-            payload["filter"] = dict(self.filter)
-        if self.exact is not None:
-            payload["exact"] = self.exact
+        payload: dict[str, Any] = {"mode": self.mode}
+        match self.mode:
+            case "lexical":
+                if self.fuzzy:
+                    if self.fuzzy_max_edits is not None:
+                        payload["fuzzy_max_edits"] = self.fuzzy_max_edits
+                    if self.fuzzy_prefix_length is not None:
+                        payload["fuzzy_prefix_length"] = self.fuzzy_prefix_length
+                payload["lexical_limit"] = self.lexical_limit
+            case "dense":
+                payload["dense_limit"] = self.dense_limit
+                payload["num_dense_candidates"] = self.num_dense_candidates
+            case "hybrid_rrf":
+                payload["text_weight"] = self.text_weight
+                payload["vector_weight"] = self.vector_weight
+                payload["final_limit"] = self.final_limit
+
         return payload
 
     def _search_with_current_parameters(
-        self, vector_store: MongoDBVectorStore, query: str
+        self, vector_stores: list[MongoDBVectorStore], query: str
     ) -> list[Document]:
-        return vector_store.search(
-            query=query,
-            k=self.k,
-            mode=self.mode,
-            vector_weight=self.vector_weight,
-            text_weight=self.text_weight,
-            dense_limit=self.dense_limit,
-            lexical_limit=self.lexical_limit,
-        )
+        with ThreadPoolExecutor() as executor:
+            per_store_results = list(
+                executor.map(
+                    lambda vs: vs.search(
+                        query=query,
+                        mode=self.mode,
+                        lexical_limit=self.lexical_limit,
+                        fuzzy=self.fuzzy,
+                        fuzzy_max_edits=self.fuzzy_max_edits,
+                        fuzzy_prefix_length=self.fuzzy_prefix_length,
+                        dense_limit=self.dense_limit,
+                        num_dense_candidates=self.num_dense_candidates,
+                        text_weight=self.text_weight,
+                        vector_weight=self.vector_weight,
+                        final_limit=self.final_limit,
+                    ),
+                    vector_stores,
+                )
+            )
 
-    def run(self, vector_store: MongoDBVectorStore, query: str) -> list[Document]:
+        results: list[Document] = [
+            document
+            for store_results in per_store_results
+            for document in store_results
+        ]
+        return self._reranking(results, self.final_limit)
+
+    def _reranking(self, results: list[Document], limit: int) -> list[Document]:
+        results = sorted(results, key=lambda r: r.metadata["score"], reverse=True)
+        return results[:limit]
+
+    def run(
+        self, vector_stores: list[MongoDBVectorStore], query: str
+    ) -> list[Document]:
         raise NotImplementedError("Subclasses must implement run().")
 
 
@@ -75,16 +90,15 @@ class SearchParametersOverride(CurrentSearchParameters):
 
     _OVERRIDABLE_FIELDS = {
         "mode",
-        "k",
-        "num_candidates",
+        "final_limit",
+        "lexical_limit",
         "fuzzy",
+        "fuzzy_max_edit",
+        "fuzzy_prefix_length",
+        "dense_limit",
+        "num_dense_candidates",
         "vector_weight",
         "text_weight",
-        "inner_limits",
-        "dense_limit",
-        "lexical_limit",
-        "filter",
-        "exact",
     }
 
     def __init__(self, **overrides: Any) -> None:
@@ -95,5 +109,7 @@ class SearchParametersOverride(CurrentSearchParameters):
                 raise ValueError(msg)
             setattr(self, field_name, value)
 
-    def run(self, vector_store: MongoDBVectorStore, query: str) -> list[Document]:
-        return self._search_with_current_parameters(vector_store, query)
+    def run(
+        self, vector_stores: list[MongoDBVectorStore], query: str
+    ) -> list[Document]:
+        return self._search_with_current_parameters(vector_stores, query)

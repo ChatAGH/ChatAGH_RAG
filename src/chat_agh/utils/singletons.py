@@ -11,8 +11,11 @@ mongo_client: MongoClient = MongoClient(
     os.environ["MONGODB_URI"], tlsAllowInvalidCertificates=True
 )
 
+# Force the embedding model to run on CPU so that any limited GPU memory
+# can be fully utilized by Ollama during local experiments.
 embedding_model: SentenceTransformer = SentenceTransformer(
-    "intfloat/multilingual-e5-large"
+    "intfloat/multilingual-e5-large",
+    device="cpu",
 )
 
 logger = logging.getLogger("chat_graph_logger")
