@@ -5,14 +5,17 @@ from langchain_core.runnables import Runnable
 
 from chat_agh.prompts import SUMMARY_GENERATION_PROMPT_TEMPLATE
 from chat_agh.states import RetrievalState
+from chat_agh.utils.utils import (
+    log_execution_time,
+    retry_on_exception,
+)
 from chat_agh.utils.retrieved_context import RetrievedContext
-from chat_agh.utils.utils import log_execution_time, retry_on_exception
-from chat_agh.utils.model_inference import GoogleGenAIModelInference
+from chat_agh.utils.model_inference import OpenAIModelInference
 
 
 class SummaryGeneration:
     def __init__(self) -> None:
-        self.llm = GoogleGenAIModelInference()
+        self.llm = OpenAIModelInference()
         self.prompt = PromptTemplate(
             input_variables=["context", "query"],
             template=SUMMARY_GENERATION_PROMPT_TEMPLATE,

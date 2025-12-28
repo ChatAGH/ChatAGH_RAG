@@ -19,14 +19,21 @@ class SupervisorNode:
         self,
         state: ChatState,
         writer: Optional[StreamWriter] = None,
-    ) -> Dict[str, Optional[str | Dict[str, str]] | bool]:
+        max_search_tries: int = 3,
+    ) -> Dict[str, Optional[str | Dict[str, str]] | bool | int]:
+        is_retrieval_enabled = (
+            True if state["num_search_tries"] < max_search_tries else False
+        )
+
         agent_response = self.agent.invoke(
             agents_info=state["agents_info"],
             chat_history=state["chat_history"],
             context=state["context"],
+            is_retrieval_enabled=is_retrieval_enabled,
         )
 
         logger.info(f"Retrieval decision: {agent_response.retrieval_decision}")
+
         if agent_response.retrieval_decision:
             logger.info(f"Queries: {agent_response.queries}")
         else:
@@ -39,4 +46,5 @@ class SupervisorNode:
             "retrieval_decision": agent_response.retrieval_decision,
             "agents_queries": agent_response.queries,
             "response": agent_response.response,
+            "num_search_tries": state["num_search_tries"] + 1,
         }

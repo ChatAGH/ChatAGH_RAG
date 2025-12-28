@@ -5,6 +5,23 @@ from langchain_core.documents import Document
 
 @dataclass
 class RetrievedContext:
+    """
+    Container for retrieved and augmented context associated with a single source URL.
+
+    Attributes:
+        source_url (str):
+            The URL from which the primary retrieved chunks originate.
+
+        chunks (list[Document]):
+            The list of document chunks directly retrieved during the initial
+            similarity search for this URL.
+
+        related_chunks (dict[str, list[Document]]):
+            A mapping of related URLs to their corresponding chunks, obtained
+            through graph-based context augmentation. These represent additional
+            context semantically linked to the primary source page.
+    """
+
     source_url: str
     chunks: list[Document]
     related_chunks: dict[str, list[Document]]
@@ -22,3 +39,6 @@ class RetrievedContext:
             f"Related context: {related_chunks_text}"
         )
         return text
+
+    def __str__(self) -> str:
+        return self.text

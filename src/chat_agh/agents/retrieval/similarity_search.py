@@ -6,7 +6,13 @@ from pymongo.collection import Collection
 
 from chat_agh.agents.retrieval.utils import aggregate_by_url
 from chat_agh.states import RetrievalState
-from chat_agh.utils import MONGO_DATABASE_NAME, log_execution_time, logger, mongo_client
+from chat_agh.utils.utils import (
+    MONGO_DATABASE_NAME,
+    log_execution_time,
+    logger,
+    mongo_client,
+)
+from chat_agh.utils.retrieved_context import RetrievedContext
 from chat_agh.vector_store.mongodb import MongoDBVectorStore
 
 
@@ -22,7 +28,9 @@ class SimilaritySearch:
         ]
 
     @log_execution_time
-    def __call__(self, state: RetrievalState) -> Dict[str, Dict[str, list[Document]]]:
+    def __call__(
+        self, state: RetrievalState
+    ) -> Dict[str, Dict[str, list[Document]] | list[RetrievedContext]]:
         retrieved_chunks = self.vector_store.search(
             state["query"], final_limit=self.num_retrieved_chunks
         )
@@ -35,7 +43,13 @@ class SimilaritySearch:
         )
         chunks_windows = self.get_chunks_windows(aggregated_docs)
 
-        return {"retrieved_chunks": chunks_windows}
+        return {
+            "retrieved_chunks": chunks_windows,
+            "retrieved_context": [
+                RetrievedContext(source_url=url, chunks=chunks, related_chunks={})
+                for url, chunks in chunks_windows.items()
+            ],
+        }
 
     def get_chunks_windows(
         self, urls: Dict[str, list[Document]]

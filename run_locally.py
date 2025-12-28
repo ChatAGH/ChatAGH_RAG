@@ -11,7 +11,9 @@ if __name__ == "__main__":
 
     chat_graph = ChatGraph()
 
-    chat_history = ChatHistory(messages=[HumanMessage("Hejka, kto jest rektorem AGH?")])
+    chat_history = ChatHistory(
+        messages=[HumanMessage("Hejka, kto jest dziekanem WEAIiIB AGH?")]
+    )
     logger.info("START")
     for c in chat_graph.stream(chat_history):
         print(c)
