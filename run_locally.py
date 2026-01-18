@@ -9,11 +9,11 @@ from chat_agh.utils.utils import logger
 if __name__ == "__main__":
     load_dotenv("/Users/wnowogorski/PycharmProjects/ChatAGH_RAG/.env")
 
-    chat_graph = ChatGraph()
+    chat_graph = ChatGraph(enable_retrieval=False)
 
     chat_history = ChatHistory(
         messages=[HumanMessage("Hejka, kto jest dziekanem WEAIiIB AGH?")]
     )
     logger.info("START")
-    for c in chat_graph.stream(chat_history):
-        print(c)
+    res = chat_graph.invoke(chat_history)
+    print(res)

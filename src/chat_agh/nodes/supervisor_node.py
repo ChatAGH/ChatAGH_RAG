@@ -10,7 +10,8 @@ from chat_agh.utils.utils import log_execution_time, logger, retry_on_exception
 
 
 class SupervisorNode:
-    def __init__(self) -> None:
+    def __init__(self, is_retrieval_enabled: bool = True) -> None:
+        self.is_retrieval_enabled = is_retrieval_enabled
         self.agent = SupervisorAgent()
 
     @retry_on_exception(attempts=2, delay=1, backoff=3)
@@ -19,11 +20,11 @@ class SupervisorNode:
         self,
         state: ChatState,
         writer: Optional[StreamWriter] = None,
-        max_search_tries: int = 3,
+        max_search_tries: int = 1,
     ) -> Dict[str, Optional[str | Dict[str, str]] | bool | int]:
         is_retrieval_enabled = (
             True if state["num_search_tries"] < max_search_tries else False
-        )
+        ) and self.is_retrieval_enabled
 
         agent_response = self.agent.invoke(
             agents_info=state["agents_info"],
@@ -43,7 +44,8 @@ class SupervisorNode:
                 writer(AIMessage(agent_response.response))
 
         return {
-            "retrieval_decision": agent_response.retrieval_decision,
+            "retrieval_decision": agent_response.retrieval_decision
+            and self.is_retrieval_enabled,
             "agents_queries": agent_response.queries,
             "response": agent_response.response,
             "num_search_tries": state["num_search_tries"] + 1,

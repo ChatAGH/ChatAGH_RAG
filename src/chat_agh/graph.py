@@ -20,24 +20,28 @@ from chat_agh.utils.chat_history import ChatHistory
 
 
 class ChatGraph:
-    def __init__(self) -> None:
+    def __init__(self, **kwargs) -> None:
         self.graph: Any = (
             StateGraph(ChatState)
             .add_node(
                 "initial_retrieval_node",
                 InitialRetrievalNode(
                     collections=[
-                        "cluster_0",
-                        "cluster_6",
-                        "cluster_7",
-                        "cluster_8",
-                        "cluster_9",
+                        "cluster_0_v3",
+                        "cluster_6_v3",
+                        "cluster_7_v3",
+                        "cluster_8_v3",
+                        "cluster_9_v3",
                     ],
-                    num_chunks=5,
-                    k=5,
+                    search_config=kwargs.get("initial_retrieval_config"),
                 ),
             )
-            .add_node("supervisor_node", SupervisorNode())
+            .add_node(
+                "supervisor_node",
+                SupervisorNode(
+                    is_retrieval_enabled=kwargs.get("enable_retrieval", True),
+                ),
+            )
             .add_node("retrieval_node", RetrievalNode())
             .add_edge(START, "initial_retrieval_node")
             .add_edge("initial_retrieval_node", "supervisor_node")
@@ -64,10 +68,10 @@ class ChatGraph:
             num_search_tries=0,
         )
         result = cast(dict[str, Any], self.graph.invoke(state, config=config))
-        response = result.get("response")
-        if not isinstance(response, str):
-            raise TypeError("ChatGraph expected response to be a string")
-        return response
+        # response = result.get("response")
+        # if not isinstance(response, str):
+        #     raise TypeError("ChatGraph expected response to be a string")
+        return result
 
     def stream(self, chat_history: ChatHistory) -> Generator[str, None, None]:
         state = ChatState(
@@ -97,7 +101,7 @@ class ChatGraph:
 if __name__ == "__main__":
     chat_graph = ChatGraph()
 
-    chat_history = ChatHistory(messages=[HumanMessage("Kiedy jest otwarcie wydziału?")])
+    chat_history = ChatHistory(messages=[HumanMessage("Jak zostać studentem AGH?")])
     logger.info("START")
 
     res = chat_graph.invoke(
@@ -109,6 +113,8 @@ if __name__ == "__main__":
     #     print(c)
 
     logger.info("END")
+
+    print(res["retrieved_chunks"])
 
     from chat_agh.utils.model_inference import OpenAIModelInference
 

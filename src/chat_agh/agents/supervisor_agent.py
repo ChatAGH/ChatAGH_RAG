@@ -75,7 +75,7 @@ class SupervisorAgent:
         self,
         agents_info: AgentsInfo,
         chat_history: ChatHistory,
-        context: Optional[List[Document]] = None,
+        context: Optional[List[List[Document]]] = None,
         is_retrieval_enabled: bool = True,
     ) -> SupervisorOutput:
         return self.chain.invoke(

@@ -19,9 +19,6 @@ class RetrievalNode:
                 agent_name=agent_info.name,
                 index_name=agent_info.vector_store_index_name,
                 description=agent_info.description,
-                graph_augmentation=False,
-                num_retrieved_chunks=4,
-                window_size=1,
             )
             for agent_info in RETRIEVAL_AGENTS
         ]
@@ -29,20 +26,23 @@ class RetrievalNode:
     @log_execution_time
     def __call__(self, state: ChatState) -> Dict[str, AgentsInfo | str]:
         queries = state["agents_queries"]
-        responses: List[AgentDetails] = []
+        responses: List[tuple[AgentDetails, list]] = []
 
-        def query_agent(agent: RetrievalAgent, query: str) -> AgentDetails:
+        def query_agent(agent: RetrievalAgent, query: str) -> tuple[AgentDetails, list]:
             logger.info(f"Querying agent: {agent.name}. Query: {query}")
             agent_response = agent.query(query)
+
             logger.info(f"Agent response: {agent_response}")
             return AgentDetails(
                 name=agent.name,
                 description=agent.description,
                 cached_history={
                     "query": query,
-                    "response": agent_response,
+                    "response": agent_response.get(
+                        "summary", agent_response.get("retrieved_context")
+                    ),
                 },
-            )
+            ), agent_response.get("retrieved_context")
 
         futures = []
         with ThreadPoolExecutor() as executor:
@@ -55,6 +55,7 @@ class RetrievalNode:
                 responses.append(future.result())
 
         return {
-            "agents_info": AgentsInfo(agents_details=responses),
+            "agents_info": AgentsInfo(agents_details=[r[0] for r in responses]),
             "context": "\n".join(str(r) for r in responses),
+            "retrieved_chunks": [r[1] for r in responses],
         }

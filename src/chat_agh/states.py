@@ -10,6 +10,7 @@ from chat_agh.utils.retrieved_context import RetrievedContext
 class ChatState(TypedDict, total=False):
     num_search_tries: int
     context: list[Document]
+    retrieved_chunks: list[Document]
     chat_history: ChatHistory
     agents_info: AgentsInfo
     retrieval_decision: bool

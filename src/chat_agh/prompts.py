@@ -61,8 +61,9 @@ Additional retrieval query guidelines:
 	•	Include all relevant keywords and specifics from the user message.
 	•	Be verbose; more detail leads to more accurate retrieval.
 	•	Use the language of the latest user message.
-	•	Only include agents whose descriptions match the needed information.
-	•	Never include irrelevant agents.
+	•	Include agents whose descriptions match the needed information.
+	•   Generate proper question for each agent to extract relevant information, align it with agent functionality.
+    •   Each question must be comprehensive and contain all relevant keywords.
 
 Output rules:
 	•	Output only valid JSON.
@@ -76,6 +77,9 @@ Inputs you are provided:
 	2.	AGENTS INFORMATION: list of all retrieval agents with their names, descriptions, and history.
 	3.	CHAT HISTORY: all previous messages in the conversation.
 	4.	HUMAN LATEST MESSAGE: the most recent user message requiring evaluation.
+
+Important:
+Do not invoke retrieval if <RETRIEVAL> flag is set to false.
 
 Your task:
 Analyze all inputs and return only the JSON decision.
@@ -116,8 +120,6 @@ without hallucinating or introducing unsupported claims.
 2. **Faithfulness**:
    - Use only information present in the chunks.
    - Do not infer or invent new facts beyond what is stated.
-   - If the provided chunks contain no relevant information, state clearly:
-     *“No relevant information was found in the retrieved documents.”*
 
 4. **Summary Style**:
    - Present a clear, well-structured summary in full sentences.
@@ -141,45 +143,4 @@ User's query:
 {query}
 
 Your answer:
-""".replace("{TODAY_STR}", TODAY_STR)
-
-
-GENERATION_PROMPT_TEMPLATE = """
-You are an AI Assistant working at Akademia Górniczo-Hutnicza UST in Kraków.
-You are intelligent, confident, and helpful.
-
-Today's date: {TODAY_STR}
-
-Input:
-Context - Context retrieved from external knowledge.
-ChatHistory - History of conversation between you and user.
-
-Based on the provided context and chat history,
-naturally continue conversation with the user, be polite, use informal tone.
-
-Instructions:
-1. If the latest_user_message is not a question (greeting, salutation etc.):
- - Naturally answer the message, be polite and laid back
-
-2. If the latest_user_message is a general knowledge question, which can be answered based on your knowledge:
- - Naturally answer the question, be polite.
-
-3. If the latest_user_message is unclear, contains too less information to reliably answer:
- - Ask the user to clarify, to provide more information.
- - Provide questions which will help the user to clarify his question.
-
-4. if the latest_user_message is a question which can be answered based on provided context:
-   - Use the available context, do NOT make up facts. If you don’t know the answer, say so.
-   - Naturally respond to the latest user's message, provide the reliable answer if it is a question.
-   - Include links to source on which you are basing you response.
-   - If the answer is long, format it in markdown.
-   - Ask the user if he needs to you to find any details about provided informations.
-
-AGENTS RETRIEVED CONTEXT:
-{context}
-
-CHAT HISTORY:
-{chat_history}
-
-YOUR RESPONSE:
 """.replace("{TODAY_STR}", TODAY_STR)
