@@ -68,9 +68,7 @@ class ChatGraph:
             num_search_tries=0,
         )
         result = cast(dict[str, Any], self.graph.invoke(state, config=config))
-        # response = result.get("response")
-        # if not isinstance(response, str):
-        #     raise TypeError("ChatGraph expected response to be a string")
+
         return result
 
     def stream(self, chat_history: ChatHistory) -> Generator[str, None, None]:
