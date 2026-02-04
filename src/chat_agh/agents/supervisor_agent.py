@@ -3,7 +3,7 @@ import os
 from collections.abc import Generator
 from typing import Any, Dict, List, Optional, Union
 
-from langchain.schema import AIMessage, BaseMessage, HumanMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_core.documents import Document
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
@@ -13,7 +13,7 @@ from pydantic import BaseModel, model_validator
 from chat_agh.prompts import SUPERVISOR_AGENT_PROMPT_TEMPLATE
 from chat_agh.utils.agents_info import RETRIEVAL_AGENTS, AgentDetails, AgentsInfo
 from chat_agh.utils.chat_history import ChatHistory
-from chat_agh.utils.model_inference import GoogleGenAIModelInference
+from chat_agh.utils.model_inference import OpenAIModelInference
 
 
 class SupervisorOutput(BaseModel):
@@ -60,7 +60,7 @@ class SupervisorAgent:
     def __init__(self) -> None:
         super().__init__()
         self.api_keys = json.loads(os.getenv("GEMINI_API_KEYS", "[]"))
-        self.llm = GoogleGenAIModelInference()
+        self.llm = OpenAIModelInference()
 
         self.output_parser = PydanticOutputParser(pydantic_object=SupervisorOutput)
         self.prompt = PromptTemplate(
@@ -75,7 +75,8 @@ class SupervisorAgent:
         self,
         agents_info: AgentsInfo,
         chat_history: ChatHistory,
-        context: Optional[List[Document]] = None,
+        context: Optional[List[List[Document]]] = None,
+        is_retrieval_enabled: bool = True,
     ) -> SupervisorOutput:
         return self.chain.invoke(
             {
@@ -83,6 +84,7 @@ class SupervisorAgent:
                 "agents_info": agents_info,
                 "chat_history": chat_history[:-1],
                 "latest_user_message": chat_history[-1].content,
+                "retrieval": "ENABLED" if is_retrieval_enabled else "DISABLED",
             }
         )
 
@@ -124,4 +126,4 @@ if __name__ == "__main__":
     )
     print(res)
 
-    GoogleGenAIModelInference().get_usage()
+    OpenAIModelInference().get_usage()

@@ -39,7 +39,7 @@ class RetrievalAgentInfo:
 RETRIEVAL_AGENTS = [
     RetrievalAgentInfo(
         name="MAIN AGENT",
-        vector_store_index_name="cluster_0",
+        vector_store_index_name="cluster_0_v3",
         description="""
         Informacje ogólne i obsługa dydaktyki – Akademia Górniczo‑Hutnicza im. Stanisława Staszica w Krakowie
 
@@ -56,10 +56,10 @@ RETRIEVAL_AGENTS = [
         """,
     ),
     RetrievalAgentInfo(
-        name="SKOS AGENT",
-        vector_store_index_name="cluster_6",
+        name="SKOS AGH AGENT",
+        vector_store_index_name="cluster_6_v3",
         description="""
-        System informacji o pracownikach & jednostkach – SkOs AGH
+        System informacji o pracownikach & jednostkach – SKOS AGH
 
         Zakres treści (scope):
 	    -	Baza informacji kontaktowych pracowników, ich afiliacji, jednostek, stanowisk w AGH.  ￼
@@ -73,7 +73,7 @@ RETRIEVAL_AGENTS = [
     ),
     RetrievalAgentInfo(
         name="SPRAWY STUDENCKIE AGENT",
-        vector_store_index_name="cluster_7",
+        vector_store_index_name="cluster_7_v3",
         description="""
         Zakwaterowanie & sprawy studenckie – kampus i wsparcie studenta Akademia Górniczo‑Hutnicza im. Stanisława Staszica (AGH)”
 
@@ -91,12 +91,13 @@ RETRIEVAL_AGENTS = [
     ),
     RetrievalAgentInfo(
         name="REKRUTACJA AGENT",
-        vector_store_index_name="cluster_8",
+        vector_store_index_name="cluster_8_v3",
         description="""
         Nazwa klastra: „Rekrutacja, szkolenia i promocja – usługi kształcenia i wizerunku Akademia Górniczo‑Hutnicza im Stanisława Staszica (AGH)”
 
         Zakres treści (scope):
         - Proces rekrutacji kandydatów na studia – portal rekrutacja.agh.edu.pl: terminy, warunki, procedury, skierowany do kandydatów.
+        - Lista dostepnych kierunków.
         - Oferta kursów i szkoleń (zarówno wewnętrznych dla pracowników/studentów, jak i zewnętrznych) – serwis „Szkolenia” AGH.  ￼
         - Program strategiczny „Inicjatywa Doskonałości Uczelnia Badawcza (IDUB)” – działania badawcze, inwestycje AGH w badania, rozwój kadry i infrastruktury.  ￼￼
         - Strona marki, wizerunku i komunikacji uczelni – Centrum Komunikacji i Marketingu AGH (CKiM) odpowiadająca za portal uczelni i działania promocyjne.  ￼
@@ -110,9 +111,9 @@ RETRIEVAL_AGENTS = [
     ),
     RetrievalAgentInfo(
         name="SYLABUSY AGENT",
-        vector_store_index_name="cluster_9",
+        vector_store_index_name="cluster_9_v3",
         description="""
-        Nazwa klastra: „Zamówienia publiczne & sylabusy-oferta dydaktyczna – Akademia Górniczo‑Hutnicza im. Stanisława Staszica (AGH)”
+        Nazwa klastra: „Zamówienia publiczne & sylabusy-oferta dydaktyczna – Akademia Górniczo‑Hutnicza im. Stanisława Staszica (AGH)”
 
         Zakres treści (scope):
         - Platforma Sylabusy AGH (sylabusy.agh.edu.pl) – katalog kierunków, programy studiów, moduły, efekty kształcenia, sylabusy przedmiotów – zarówno w języku polskim jak i angielskim.  ￼
@@ -134,4 +135,7 @@ RETRIEVAL_AGENTS = [
     #       Dodatkowo często dostępne są wzory dokumentów, regulaminy studiów i informacje dotyczące akademików, pomocy materialnej czy szeroko pojętej działąlności uczelni.
     #     """,
     # ),
+    # RetrievalAgentInfo(
+    #     "doc.agh.pl"
+    # )
 ]

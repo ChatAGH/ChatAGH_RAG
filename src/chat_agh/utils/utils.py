@@ -1,41 +1,24 @@
 import functools
-import json
+import logging
 import os
 import time
 from collections.abc import Callable
 from typing import ParamSpec, TypeVar
 
-from dotenv import load_dotenv
+from pymongo import MongoClient
+from sentence_transformers import SentenceTransformer
 
-from chat_agh.utils import logger
+logger = logging.getLogger("chat_graph_logger")
+logger.setLevel(logging.INFO)
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        fmt="[%(asctime)s] [%(levelname)s] %(name)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
-load_dotenv()
-
-
-def _load_api_key(list_var: str, single_var: str) -> str:
-    """Read API key from either a JSON list or a plain string env var."""
-
-    list_value = os.getenv(list_var)
-    if list_value:
-        try:
-            parsed = json.loads(list_value)
-        except json.JSONDecodeError as exc:
-            raise ValueError(f"{list_var} must be a JSON array") from exc
-        if not isinstance(parsed, list) or not parsed:
-            raise ValueError(f"{list_var} must contain at least one entry")
-        first = parsed[0]
-        if not isinstance(first, str):
-            raise ValueError(f"{list_var} entries must be strings")
-        return first
-
-    single_value = os.getenv(single_var)
-    if single_value:
-        return single_value
-
-    raise KeyError(f"Set {list_var} (JSON array) or {single_var} (string) env var")
-
-
-GEMINI_API_KEY = _load_api_key("GEMINI_API_KEYS", "GEMINI_API_KEY")
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -93,3 +76,14 @@ def retry_on_exception(
         return wrapper
 
     return decorator
+
+
+mongo_client: MongoClient = MongoClient(
+    os.environ.get("MONGODB_URI"), tlsAllowInvalidCertificates=True
+)
+
+MONGO_DATABASE_NAME = "chat_agh"
+
+embedding_model: SentenceTransformer = SentenceTransformer(
+    "intfloat/multilingual-e5-large"
+)

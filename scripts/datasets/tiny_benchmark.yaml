@@ -1,0 +1,115 @@
+- question: Jakie glowne formy wsparcia dla studentow oferuje Biuro Karier AGH?
+  answer: Biuro Karier AGH organizuje targi pracy i konsultacje doradcze dla studentow.
+  evaluation_criteria:
+  - Wskazano Biuro Karier AGH.
+  - Wymieniono przynajmniej dwie formy wsparcia (targi, konsultacje).
+- question: Jakie jest stanowisko dr inż. Joanny Barniak w Akademii Górniczo-Hutniczej?
+  answer: Dr inż. Joanna Barniak jest adiunktem w Katedrze Geologii Ogólnej i Geoturystyki na Wydziale Geologii, Geofizyki
+    i Ochrony Środowiska Akademii Górniczo-Hutniczej im. Stanisława Staszica w Krakowie.
+  evaluation_criteria:
+  - W odpowiedzi podano pełne imię i nazwisko dr inż. Joanny Barniak.
+  - Wskazano, że Joanna Barniak jest adiunktem.
+  - 'Podano nazwę jednostki: Katedra Geologii Ogólnej i Geoturystyki.'
+  - 'Wymieniono wydział: Wydział Geologii, Geofizyki i Ochrony Środowiska.'
+  - 'Zawarto pełną nazwę uczelni: Akademia Górniczo-Hutnicza im. Stanisława Staszica w Krakowie.'
+  source_url: https://skos.agh.edu.pl/osoba/joanna-barniak-7380.html
+  source_ref: html_chunk_1
+- question: Jakie jest stanowisko Danuty Cygal w Akademii Górniczo-Hutniczej im. Stanisława Staszica w Krakowie?
+  answer: Danuta Cygal jest pracownikiem gospodarczym w Pionie Spraw Studenckich, w Dziale Domów Studenckich, w Domu Studenckim
+    Nr 1 - 'OLIMP'.
+  evaluation_criteria:
+  - W odpowiedzi podano pełne imię i nazwisko pracownika.
+  - Wskazano jednostkę, w której pracuje Danuta Cygal.
+  - Określono stanowisko Danuty Cygal.
+  - Wymieniono dział, w którym pracuje.
+  - Podano nazwę domu studenckiego, w którym pracuje.
+  source_url: https://skos.agh.edu.pl/osoba/danuta-cygal-10178.html
+  source_ref: html_chunk_1
+
+- question: Jakie są zasady odbywania praktyk zawodowych na Wydziale Metali Nieżelaznych oraz jakie są wymagania dotyczące
+    ich organizacji?
+  answer: Praktyki zawodowe na I stopniu kształcenia na Wydziale Metali Nieżelaznych trwają obowiązkowo 4 tygodnie i są przewidziane
+    na 6 semestrze. Zaleca się, aby praktyki odbywały się w okresie wolnym od zajęć dydaktycznych. Opiekun praktyk, powołany
+    przez Dziekana, organizuje miejsca praktyk w zakładach przemysłowych. Student ma również możliwość samodzielnego znalezienia
+    miejsca praktyki, które musi być zatwierdzone przez opiekuna. Praktyki mogą być realizowane w krajowych i zagranicznych
+    zakładach, instytucjach publicznych i niepublicznych związanych z kierunkiem studiów. Pomiędzy zakładem pracy a wydziałem
+    podpisywane jest porozumienie, a student przedstawia opiekunowi plan praktyki, który wymaga akceptacji kierownictwa zakładu.
+    Po zakończeniu praktyki student musi przedstawić sprawozdanie, na podstawie którego praktyka jest zaliczana.
+  evaluation_criteria:
+    - W odpowiedzi podano, że praktyki trwają 4 tygodnie.
+    - Wskazano, że praktyki są przewidziane na 6 semestrze.
+    - Zalecenie dotyczące odbywania praktyk w okresie wolnym od zajęć dydaktycznych zostało uwzględnione.
+    - Opiekun praktyk jest powoływany przez Dziekana i organizuje miejsca praktyk.
+    - Podano, że student może samodzielnie znaleźć miejsce praktyki, które musi być zatwierdzone.
+    - Wymieniono konieczność przedstawienia sprawozdania po zakończeniu praktyki.
+  source_url: https://sylabusy.agh.edu.pl/public/api/education-program-document/show/25-rcm-ii-n-14
+  source_ref: pdf_page_6
+
+- question: W jakim roku powstala Akademia Gorniczo Hutnicza w Krakowie?
+  answer: AGH zostala powolana w 1919 roku.
+  evaluation_criteria:
+    - Wspomniano rok 1919.
+    - Jasno powiedziano, ze chodzi o zalozenie AGH.
+- question: Jakie są warunki skorzystania z uprawnień do uzyskania punktów dodatkowych w rekrutacji na AGH?
+  answer: Aby skorzystać z uprawnień do uzyskania punktów dodatkowych w rekrutacji na AGH, należy dokonać rejestracji w systemie
+    e-Rekrutacja oraz przedstawić zaświadczenie poświadczające osiągnięcie lub aktywność w okresie przeznaczonym na składanie
+    deklaracji przystąpienia do kwalifikacji na studia w danym cyklu rekrutacyjnym.
+  evaluation_criteria:
+  - W odpowiedzi podano, że konieczna jest rejestracja w systemie e-Rekrutacja.
+  - Wymieniono konieczność przedstawienia zaświadczenia poświadczającego osiągnięcie lub aktywność.
+  - Wskazano, że zaświadczenie musi być dostarczone w określonym okresie składania deklaracji.
+  source_url: https://rekrutacja.agh.edu.pl/punkty-dodatkowe/
+  source_ref: html_chunk_2
+- question: Jakie są zasady dotyczące badań lekarskich dla studentów I roku na AGH?
+  answer: Badania lekarskie dla studentów I roku na AGH można zrealizować nieodpłatnie w wybranych przychodniach, na podstawie
+    skierowania otrzymanego z Centrum Rekrutacji AGH. Szczegóły dotyczące przychodni dostępne są na stronie http://www.bhp.agh.edu.pl/kandydaci/wykaz-przychodni/.
+    W pozostałych Poradniach Medycyny Pracy badania te mogą być wykonane, ale odpłatnie. Uzyskane zaświadczenie o braku przeciwwskazań
+    zdrowotnych do podjęcia studiów należy dostarczyć do Dziekanatu Wydziału prowadzącego dany kierunek.
+  evaluation_criteria:
+  - W odpowiedzi wskazano, że badania lekarskie są realizowane na podstawie skierowania z Centrum Rekrutacji AGH.
+  - Podano, że badania są nieodpłatne w wybranych przychodniach oraz odpłatne w pozostałych.
+  - Wymieniono konieczność dostarczenia zaświadczenia do Dziekanatu Wydziału.
+  source_url: https://rekrutacja.agh.edu.pl/punkty-dodatkowe/
+  source_ref: html_chunk_3
+- question: Kiedy została dodana informacja o przebudowie i remoncie DS7 Zaścianek?
+  answer: Informacja o przebudowie i remoncie DS7 Zaścianek została dodana 4 listopada 2025 roku.
+  evaluation_criteria:
+  - 'Podano dokładną datę dodania informacji: 04.11.2025'
+  - 'Wskazano, że dotyczy to konkretnego obiektu: DS7 Zaścianek'
+  - Odpowiedź jest zgodna z treścią fragmentu dokumentu
+  source_url: https://www.miasteczko.agh.edu.pl/news/385/58/Informacja-o-przebudowie-i-remoncie-DS7-Zascianek.html
+  source_ref: html_chunk_1
+- question: Jakie są główne działy regulaminu pracy AGH i jakie tematy są w nich poruszane?
+  answer: Regulamin pracy AGH składa się z pięciu głównych działów. Dział I zawiera postanowienia ogólne (§ 1-3). Dział II
+    dotyczy praw i obowiązków pracodawcy oraz pracownika, w tym obowiązków pracodawcy (§ 6) oraz uprawnień pracodawcy (§ 7-12).
+    Dział III koncentruje się na czasie pracy (§ 40-71b), a Dział IV na wypłacie wynagrodzenia za pracę (§ 72-75). Ostatni,
+    Dział V, odnosi się do dyscypliny pracy (§ 76-81).
+  evaluation_criteria:
+  - Wymieniono wszystkie pięć głównych działów regulaminu.
+  - Podano konkretne numery paragrafów dla każdego działu.
+  - Wskazano tematy poruszane w każdym dziale.
+  source_url: https://www.agh.edu.pl/home/ckim/dokumenty/regulaminy/r_pracy/Regulamin_Pracy_AGH_-_Zalacznik_1_do_Zarzadzenia_51_2025_Rektora.pdf
+  source_ref: pdf_page_2
+- question: Jakie są różne systemy czasu pracy wymienione w regulaminie AGH i jakie są ich numery paragrafów?
+  answer: Regulamin AGH wymienia kilka systemów czasu pracy. System podstawowy opisany jest w paragrafach § 57-58, system
+    równoważny w § 59-64, system zadaniowy w § 65, system skróconego tygodnia pracy w § 66, system pracy weekendowej w § 67,
+    a ruchomy czas pracy w § 68. Dodatkowo, indywidualny rozkład czasu pracy jest opisany w § 69, a praca w porze nocnej w
+    § 70.
+  evaluation_criteria:
+  - Wymieniono wszystkie systemy czasu pracy.
+  - Podano numery paragrafów dla każdego systemu.
+  - Zidentyfikowano różne formy organizacji czasu pracy.
+  source_url: https://www.agh.edu.pl/home/ckim/dokumenty/regulaminy/r_pracy/Regulamin_Pracy_AGH_-_Zalacznik_1_do_Zarzadzenia_51_2025_Rektora.pdf
+  source_ref: pdf_page_2
+- question: Jakie są prawa i obowiązki pracodawcy w zakresie bezpieczeństwa i higieny pracy oraz ochrony przeciwpożarowej
+    w AGH?
+  answer: Prawa i obowiązki pracodawcy w zakresie bezpieczeństwa i higieny pracy oraz ochrony przeciwpożarowej są opisane
+    w Rozdziale I Działu VI regulaminu. Obejmują one zapewnienie odpowiednich warunków pracy, które minimalizują ryzyko wypadków
+    oraz zagrożeń dla zdrowia pracowników. Pracodawca ma również obowiązek informować pracowników o zagrożeniach oraz organizować
+    szkolenia w zakresie bhp i ppoż.
+  evaluation_criteria:
+  - W odpowiedzi wymieniono prawa i obowiązki pracodawcy.
+  - Podano, że regulamin odnosi się do minimalizacji ryzyka wypadków.
+  - Wskazano na obowiązek informowania pracowników o zagrożeniach.
+  source_url: https://www.agh.edu.pl/home/ckim/dokumenty/regulaminy/r_pracy/Regulamin_Pracy_AGH_-_Zalacznik_1_do_Zarzadzenia_51_2025_Rektora.pdf
+  source_ref: pdf_page_3
